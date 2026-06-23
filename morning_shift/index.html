@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morning Shift Report — Infozillion Teletech Bd Ltd</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── App Header ─────────────────────────────────────── -->
+<header class="app-header">
+  <div class="app-header-left">
+    <div class="app-logo"><img src="data:image/jpeg;base64,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" alt="ITBL" style="width:28px;height:28px;object-fit:contain;border-radius:6px;"></div>
+    <div>
+      <div class="app-title">Shift Report</div>
+      <div class="app-subtitle">Infozillion Teletech Bd Ltd · Service Assurance <span class="version-badge">v2.8.0</span></div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div id="save-indicator" class="status-pill saved" style="opacity:0;transition:opacity .4s;">
+      ✓ Draft saved
+    </div>
+    <button class="btn-icon-dark" onclick="openHistory()" title="Report History">&#128196; History</button>
+    <button class="btn-icon-dark" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">&#9680; Theme</button>
+    <button class="btn-icon-dark" onclick="clearDraft()" title="Clear & Reset">&#8635; Reset</button>
+  </div>
+</header>
+
+<!-- ── Main Wrap ──────────────────────────────────────── -->
+<main class="wrap">
+
+  <!-- §0 Report Header -->
+  <div class="card report-header-card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">HEADER</div>
+          <div class="sec-title">Report Information</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="report-meta">
+        <div>
+          <div class="report-meta-title">System Monitoring Overview</div>
+          <div class="report-meta-sub">Morning Shift · Service Assurance</div>
+        </div>
+        <span class="shift-badge">Morning Shift</span>
+      </div>
+      <hr class="divider">
+      <div class="row2">
+        <div class="form-group">
+          <label>Report Date</label>
+          <input type="date" id="rep-date">
+        </div>
+        <div class="form-group">
+          <label>Prepared By</label>
+          <input type="text" id="rep-author" placeholder="e.g. Name">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- §1 HTTP Status -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">01</div>
+          <div class="sec-title">HTTP Status — 1xx &amp; 5xx</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+
+      <!-- 1xx MNO -->
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="sub-label">1xx — MNO</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="csv-mno-status" class="csv-status"></div>
+          <div class="drop-zone" id="drop-mno" onclick="document.getElementById('csv-1xx-mno').click()" ondragover="handleDragOver(event,'drop-mno')" ondragleave="handleDragLeave('drop-mno')" ondrop="handleDrop(event,'csv-1xx-mno',parseMnoCsv)">
+            <span class="drop-zone-icon">⬆</span><span class="drop-zone-text">Drop CSV or click</span>
+            <input type="file" id="csv-1xx-mno" accept=".csv" onchange="parseMnoCsv(this)" style="display:none;">
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <button id="tog-mno-ok"    class="tog ok"  onclick="setTog('mno','ok')">
+          <span class="dot"></span> Normal
+        </button>
+        <button id="tog-mno-issue" class="tog"     onclick="setTog('mno','issue')">
+          <span class="dot"></span> Issue
+        </button>
+      </div>
+      <div id="det-mno-ok">
+        <textarea id="txt-mno-ok">Error observed minimal as usual.</textarea>
+      </div>
+      <div id="det-mno-issue" style="display:none">
+        <textarea id="txt-mno-issue" placeholder="MNO 1xx issue details…"></textarea>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 1xx IPTSP -->
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="sub-label">1xx — IPTSP</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="csv-iptsp-status" class="csv-status"></div>
+          <div class="drop-zone" id="drop-iptsp" onclick="document.getElementById('csv-1xx-iptsp').click()" ondragover="handleDragOver(event,'drop-iptsp')" ondragleave="handleDragLeave('drop-iptsp')" ondrop="handleDrop(event,'csv-1xx-iptsp',parseIptspCsv)">
+            <span class="drop-zone-icon">⬆</span><span class="drop-zone-text">Drop CSV or click</span>
+            <input type="file" id="csv-1xx-iptsp" accept=".csv" onchange="parseIptspCsv(this)" style="display:none;">
+          </div>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <button id="tog-iptsp-ok"    class="tog ok"  onclick="setTog('iptsp','ok')">
+          <span class="dot"></span> Normal
+        </button>
+        <button id="tog-iptsp-issue" class="tog"     onclick="setTog('iptsp','issue')">
+          <span class="dot"></span> Issue
+        </button>
+      </div>
+      <div id="det-iptsp-ok">
+        <textarea id="txt-iptsp-ok">Error observed minimal as usual.</textarea>
+      </div>
+      <div id="det-iptsp-issue" style="display:none">
+        <textarea id="txt-iptsp-issue" placeholder="IPTSP 1xx issue details…"></textarea>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 4xx/5xx HTTP -->
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="sub-label" style="margin:0;">HTTP 500 / 501 / 502 / 503 / 504 — Per Operator</div>
+      </div>
+      <div class="upload-zone" id="zone-http5xx" style="margin:8px 0 14px;">
+        <input type="file" id="csv-http5xx" accept=".csv" onchange="parseHttp5xxCsv(this)">
+        <div class="upload-zone__inner">
+          <div class="upload-icon">📂</div>
+          <div class="upload-label">Drop <strong>HTTP CSV</strong> or click — auto-fills codes below (optional, manual entry also works)</div>
+          <div class="upload-status" id="csv-http5xx-status"></div>
+        </div>
+      </div>
+      <div class="src-grid" id="http5xx-source-list"></div>
+
+      <div class="form-group" style="margin-top:12px;">
+        <label>Overall 5xx Remark</label>
+        <textarea id="txt-5xx-overall">Minimal fluctuations and errors as usual (All Connectivity)</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- §2 DLR / Delay -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">02</div>
+          <div class="sec-title">Delay / DLR</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span></span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="csv-dlr-status" class="csv-status"></div>
+          <div class="drop-zone" id="drop-dlr" onclick="document.getElementById('csv-dlr').click()" ondragover="handleDragOver(event,'drop-dlr')" ondragleave="handleDragLeave('drop-dlr')" ondrop="handleDrop(event,'csv-dlr',parseDlrCsv)">
+            <span class="drop-zone-icon">⬆</span><span class="drop-zone-text">Drop CSV or click</span>
+            <input type="file" id="csv-dlr" accept=".csv" onchange="parseDlrCsv(this)" style="display:none;">
+          </div>
+        </div>
+      </div>
+      <div id="dlr-dates" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <hr class="divider">
+      <div class="form-group">
+        <label>Overall DLR Status</label>
+        <textarea id="dlr-overall">DLR performance still appears normal and stable.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- §3 Network -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">03</div>
+          <div class="sec-title">Network — P2P / NTTN</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="sub-label" style="margin:0;">Times & Errors — last date from Sheet</span>
+        <button class="btn btn-ghost" id="fetch-network-btn" onclick="fetchNetworkFromSheet()" style="font-size:12px;padding:5px 12px;">
+          Fetch from Google Sheet
+        </button>
+      </div>
+      <div id="fetch-network-status" class="csv-status" style="margin-bottom:8px;"></div>
+      <div class="op-grid">
+        <div class="op-block">
+          <div class="op-name">GP</div>
+          <div class="form-group">
+            <label>Times (reconnects)</label>
+            <input type="number" class="net-times" data-op="GP" placeholder="0" min="0" oninput="scheduleAutoSave()">
+          </div>
+          <div class="op-5xx-total" style="margin-top:8px;">Errors: <span id="net-failed-GP">0</span></div>
+        </div>
+        <div class="op-block">
+          <div class="op-name">RB</div>
+          <div class="form-group">
+            <label>Times</label>
+            <input type="number" class="net-times" data-op="RB" placeholder="0" min="0" oninput="scheduleAutoSave()">
+          </div>
+          <div class="op-5xx-total" style="margin-top:8px;">Errors: <span id="net-failed-RB">0</span></div>
+        </div>
+        <div class="op-block">
+          <div class="op-name">TT</div>
+          <div class="form-group">
+            <label>Times</label>
+            <input type="number" class="net-times" data-op="TT" placeholder="0" min="0" oninput="scheduleAutoSave()">
+          </div>
+          <div class="op-5xx-total" style="margin-top:8px;">Errors: <span id="net-failed-TT">0</span></div>
+        </div>
+        <div class="op-block">
+          <div class="op-name">BL</div>
+          <div class="form-group">
+            <label>Times</label>
+            <input type="number" class="net-times" data-op="BL" placeholder="0" min="0" oninput="scheduleAutoSave()">
+          </div>
+          <div class="op-5xx-total" style="margin-top:8px;">Errors: <span id="net-failed-BL">0</span></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Overall Network Status</label>
+        <textarea id="net-overall">Minimal fluctuations and errors as usual</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- §4 Client Communication -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">04</div>
+          <div class="sec-title">Client Communication</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="row4">
+        <div class="form-group">
+          <label>WhatsApp</label>
+          <input type="number" id="ch-wa" placeholder="0" min="0" oninput="scheduleAutoSave()">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="number" id="ch-ph" placeholder="0" min="0" oninput="scheduleAutoSave()">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="number" id="ch-em" placeholder="0" min="0" oninput="scheduleAutoSave()">
+        </div>
+        <div class="form-group">
+          <label>Ticket</label>
+          <input type="number" id="ch-tk" placeholder="0" min="0" oninput="scheduleAutoSave()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- §5 Major / Pending Issues -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">05</div>
+          <div class="sec-title">Major / Pending Issues</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="toggle-row">
+        <button id="tog-issue-ok"    class="tog ok"  onclick="setTog('issue','ok')">
+          <span class="dot"></span> None
+        </button>
+        <button id="tog-issue-issue" class="tog"     onclick="setTog('issue','issue')">
+          <span class="dot"></span> Has Issues
+        </button>
+      </div>
+      <div id="det-issue" style="display:none;">
+        <div class="sub-label" style="margin-top:4px;">To-do / Pending Items</div>
+        <div id="todo-list"></div>
+        <button class="btn btn-ghost" onclick="addTodo()">+ Add Item</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- §6 Traffic Trend -->
+  <div class="card">
+    <div class="card-header" data-collapse>
+      <div class="card-header-left">
+        <div class="card-icon"></div>
+        <div>
+          <div class="sec-num">06</div>
+          <div class="sec-title">Traffic Trend</div>
+        </div>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span class="sub-label" style="margin:0;">Last 6 days with Day End values</span>
+        <button class="btn btn-ghost" id="fetch-traffic-btn" onclick="fetchTrafficFromSheet()" style="font-size:12px;padding:5px 12px;">
+          Fetch from Google Sheet
+        </button>
+      </div>
+      <div id="fetch-traffic-status" class="csv-status" style="margin-bottom:8px;"></div>
+      <div id="traffic-csv-fallback" style="display:none;margin-bottom:10px;">
+        <label style="font-size:11px;font-weight:600;color:var(--text-2);display:block;margin-bottom:4px;">
+          অথবা Traffic CSV সরাসরি upload করুন (Sheet থেকে Download → CSV)
+        </label>
+        <input type="file" accept=".csv" onchange="parseTrafficCsvUpload(this)">
+      </div>
+      <div id="traffic-list"></div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="generate-section">
+    <button id="copy-btn" class="btn btn-primary btn-generate" onclick="generateAndCopy()">
+      Copy WhatsApp Message
+    </button>
+    <button class="btn btn-pdf btn-secondary" onclick="printReport()">
+      Print / PDF
+    </button>
+  </div>
+
+  <!-- Preview -->
+  <div id="preview-section" style="display:none;">
+    <div class="card">
+      <div class="card-body">
+        <div class="preview-header">
+          <span class="preview-label">Preview</span>
+          <button class="btn btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('preview').textContent).then(()=>showToast('Copied!'))">Copy again</button>
+        </div>
+        <pre class="preview-box" id="preview"></pre>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Footer -->
+  <div class="app-footer">
+    © 2026 Najmaz Sakib · Infozillion Teletech Bd Ltd
+  </div>
+
+</main>
+
+<!-- ── History Panel ───────────────────────────────────── -->
+<div class="history-overlay" id="history-overlay" onclick="closeHistory()"></div>
+<div class="history-panel" id="history-panel">
+  <div class="history-header">
+    <span class="history-title">Report History</span>
+    <button class="btn-icon-dark" onclick="closeHistory()">✕</button>
+  </div>
+  <div class="history-list" id="history-list"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

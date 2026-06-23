@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpsHub · Service Assurance — Infozillion Teletech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   OPSHUB · Premium Launcher
+   Infozillion Teletech Bd Ltd · Service Assurance
+═══════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #F5F4F0;
+  --surface:      #FFFFFF;
+  --surface-2:    #F0EFE9;
+  --border:       #E2E0D8;
+  --border-md:    #C8C6BC;
+  --text:         #1A1916;
+  --text-2:       #6B6860;
+  --text-3:       #A8A69E;
+  --accent:       #1A1916;
+
+  /* Tool accent colors */
+  --c-daily:      #1A6B3C;
+  --c-daily-bg:   #EBF7F1;
+  --c-daily-bdr:  #B4DEC9;
+  --c-morning:    #1D4ED8;
+  --c-morning-bg: #EFF6FF;
+  --c-morning-bdr:#BDD0FD;
+  --c-mnp:        #92400E;
+  --c-mnp-bg:     #FFFBEB;
+  --c-mnp-bdr:    #FCD34D;
+  --c-ans:        #00A878;
+  --c-ans-bg:     #F0FDF9;
+  --c-ans-bdr:    #86EFCD;
+
+  --font:  'DM Sans', system-ui, sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono:  'DM Mono', 'Courier New', monospace;
+
+  --r:     12px;
+  --r-sm:  8px;
+  --sh:    0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+  --sh-lg: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+
+  --topbar: 56px;
+  --sidebar-w: 260px;
+}
+
+html { height: 100%; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+.hub-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar);
+  background: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 300;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.hub-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hub-brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.hub-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hub-brand-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.hub-brand-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.01em;
+  font-family: var(--mono);
+}
+
+.hub-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hub-clock {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.04em;
+}
+
+.hub-version {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5);
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+/* ── LAYOUT ─────────────────────────────────── */
+.hub-layout {
+  display: flex;
+  height: 100vh;
+  padding-top: var(--topbar);
+}
+
+/* ── SIDEBAR ─────────────────────────────────── */
+.hub-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: sticky;
+  top: var(--topbar);
+  height: calc(100vh - var(--topbar));
+}
+
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  font-family: var(--mono);
+  padding: 20px 20px 8px;
+}
+
+.tool-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: background 0.15s, border-left-color 0.15s;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+
+.tool-nav-item:hover { background: var(--surface-2); }
+
+.tool-nav-item.active {
+  border-left-color: var(--active-color, var(--text));
+  background: var(--surface-2);
+}
+
+.tool-nav-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--dot-color, var(--text-3));
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.tool-nav-item.active .tool-nav-dot { transform: scale(1.3); }
+
+.tool-nav-info { flex: 1; min-width: 0; }
+
+.tool-nav-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-nav-desc {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.4;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-nav-item.active .tool-nav-name { color: var(--active-color, var(--text)); font-weight: 600; }
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 16px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-footer-text {
+  font-size: 10px;
+  color: var(--text-3);
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+
+/* ── MAIN CONTENT AREA ────────────────────────── */
+.hub-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── DASHBOARD (home screen) ─────────────────── */
+.hub-dashboard {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.dashboard-hero {
+  margin-bottom: 36px;
+}
+
+.dashboard-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.dashboard-headline {
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.dashboard-headline em {
+  font-style: italic;
+  color: var(--text-2);
+}
+
+.dashboard-sub {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.65;
+  max-width: 520px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: var(--card-accent, var(--text));
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.tool-card:hover {
+  box-shadow: var(--sh-lg);
+  transform: translateY(-2px);
+  border-color: var(--card-bdr, var(--border-md));
+}
+
+.tool-card:hover::before { opacity: 1; }
+
+.tool-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.tool-card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg, var(--surface-2));
+  color: var(--card-accent, var(--text));
+  flex-shrink: 0;
+}
+
+.tool-card-icon svg { width: 20px; height: 20px; }
+
+.tool-card-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--card-bg, var(--surface-2));
+  color: var(--card-accent, var(--text-2));
+  border: 1px solid var(--card-bdr, var(--border));
+  font-weight: 500;
+}
+
+.tool-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.tool-card-tagline {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--mono);
+  margin-bottom: 12px;
+}
+
+.tool-card-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+.tool-card-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.feature-pill {
+  font-size: 11px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-weight: 400;
+}
+
+.tool-card-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tool-card-open {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--card-accent, var(--text));
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tool-card-open svg {
+  width: 14px; height: 14px;
+  transition: transform 0.15s;
+}
+
+.tool-card:hover .tool-card-open svg { transform: translateX(3px); }
+
+/* ── TOOL VIEWER ─────────────────────────────── */
+.tool-viewer {
+  flex: 1;
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tool-viewer.active { display: flex; }
+
+.tool-viewer-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tool-viewer-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.15s, color 0.15s;
+}
+
+.tool-viewer-back:hover { background: var(--surface-2); color: var(--text); }
+
+.tool-viewer-back svg { width: 14px; height: 14px; }
+
+.tool-viewer-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tool-viewer-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+.tool-viewer-bar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-viewer-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--viewer-color, var(--text));
+}
+
+.tool-iframe-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.tool-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.iframe-loading {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.iframe-loading.hidden { opacity: 0; }
+
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.loading-text {
+  font-size: 13px;
+  color: var(--text-2);
+  font-family: var(--mono);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── DASHBOARD active state (hidden when tool open) ── */
+.hub-dashboard.hidden { display: none; }
+
+/* ── INFO STRIP ─────────────────────────────── */
+.info-strip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.info-strip-icon {
+  width: 36px; height: 36px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.info-strip-text {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.info-strip-text strong { color: var(--text); }
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 768px) {
+  .hub-sidebar {
+    width: 200px;
+  }
+  .dashboard-headline { font-size: 26px; }
+  .tools-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     HEADER
+══════════════════════════════════ -->
+<header class="hub-header">
+  <div class="hub-brand">
+    <div class="hub-brand-mark">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="1"/>
+        <rect x="13" y="2" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+        <rect x="2" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.55"/>
+        <rect x="13" y="13" width="9" height="9" rx="2" fill="currentColor" opacity="0.25"/>
+      </svg>
+    </div>
+    <div class="hub-brand-text">
+      <span class="hub-brand-name">Infozillion Teletech Bd Ltd</span>
+      <span class="hub-brand-sub">Service Assurance · OpsHub</span>
+    </div>
+  </div>
+  <div class="hub-header-right">
+    <span class="hub-clock" id="clock"></span>
+    <span class="hub-version">v1.0.0</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════
+     LAYOUT
+══════════════════════════════════ -->
+<div class="hub-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="hub-sidebar">
+    <div class="sidebar-section-label">Tools</div>
+
+    <div class="tool-nav-item active" id="nav-home"
+         style="--active-color: #1A1916; --dot-color: #1A1916;"
+         onclick="showDashboard()">
+      <div class="tool-nav-dot"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">Dashboard</div>
+        <div class="tool-nav-desc">All tools overview</div>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="tool-nav-item" id="nav-daily"
+         style="--active-color: #1A6B3C; --dot-color: #1A6B3C;"
+         onclick="openTool('daily')">
+      <div class="tool-nav-dot" style="background: var(--c-daily);"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">Daily Shift Report</div>
+        <div class="tool-nav-desc">9xxx · 1xxx · HTTP · DLR</div>
+      </div>
+    </div>
+
+    <div class="tool-nav-item" id="nav-morning"
+         style="--active-color: #1D4ED8; --dot-color: #1D4ED8;"
+         onclick="openTool('morning')">
+      <div class="tool-nav-dot" style="background: var(--c-morning);"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">Morning Shift Report</div>
+        <div class="tool-nav-desc">Handover · Traffic · Network</div>
+      </div>
+    </div>
+
+    <div class="tool-nav-item" id="nav-mnp"
+         style="--active-color: #92400E; --dot-color: #92400E;"
+         onclick="openTool('mnp')">
+      <div class="tool-nav-dot" style="background: var(--c-mnp);"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">MNP Status Reporter</div>
+        <div class="tool-nav-desc">Nagios · Disk · Memory</div>
+      </div>
+    </div>
+
+    <div class="tool-nav-item" id="nav-ans"
+         style="--active-color: #00A878; --dot-color: #00A878;"
+         onclick="openTool('ans')">
+      <div class="tool-nav-dot" style="background: var(--c-ans);"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">ANS Traffic Report</div>
+        <div class="tool-nav-desc">MNO · IPTSP · Google Sheets</div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-text">
+        © 2026 Najmaz Sakib<br>
+        Infozillion Teletech Bd Ltd
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="hub-main">
+
+    <!-- ── DASHBOARD ─────────────────────────── -->
+    <div class="hub-dashboard" id="dashboard">
+
+      <div class="dashboard-hero">
+        <div class="dashboard-eyebrow">Service Assurance · Operations Hub</div>
+        <h1 class="dashboard-headline">Your tools,<br><em>one place.</em></h1>
+        <p class="dashboard-sub">Shift reports, monitoring dashboards, and traffic analytics — all your daily operational tools, accessible from a single link.</p>
+      </div>
+
+      <div class="tools-grid">
+
+        <!-- Card 1: Daily Shift Report -->
+        <div class="tool-card"
+             style="--card-accent: #1A6B3C; --card-bg: #EBF7F1; --card-bdr: #B4DEC9;"
+             onclick="openTool('daily')">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 17H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/>
+                <path d="M13 21H17m-2-2v2m-4-8h8m-8 3h4"/>
+                <rect x="13" y="13" width="8" height="8" rx="1.5"/>
+              </svg>
+            </div>
+            <span class="tool-card-badge">v2.9.0</span>
+          </div>
+          <div class="tool-card-name">Daily Shift Report</div>
+          <div class="tool-card-tagline">Shift Report Tool · ELK CSV</div>
+          <div class="tool-card-desc">ELK CSV export থেকে pivot table generate করে WhatsApp-ready report card বানায়। Auto-status detection সহ।</div>
+          <div class="tool-card-features">
+            <span class="feature-pill">9xxx Errors</span>
+            <span class="feature-pill">1xxx Errors</span>
+            <span class="feature-pill">4xx/5xx HTTP</span>
+            <span class="feature-pill">DLR Report</span>
+            <span class="feature-pill">Delay Report</span>
+            <span class="feature-pill">Drive Backup</span>
+          </div>
+          <div class="tool-card-cta">
+            <span class="tool-card-open">
+              Open Tool
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 2: Morning Shift Report -->
+        <div class="tool-card"
+             style="--card-accent: #1D4ED8; --card-bg: #EFF6FF; --card-bdr: #BDD0FD;"
+             onclick="openTool('morning')">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v1m0 16v1M4.22 4.22l.7.7m12.16 12.16.7.7M3 12h1m16 0h1M4.22 19.78l.7-.7m12.16-12.16.7-.7"/>
+                <circle cx="12" cy="12" r="4"/>
+              </svg>
+            </div>
+            <span class="tool-card-badge">v2.8.0</span>
+          </div>
+          <div class="tool-card-name">Morning Shift Report</div>
+          <div class="tool-card-tagline">Shift Handover · Google Sheets</div>
+          <div class="tool-card-desc">Morning handover report তৈরির premium tool। Google Sheets sync, auto-save, report history এবং dark mode সহ।</div>
+          <div class="tool-card-features">
+            <span class="feature-pill">1xx MNO/IPTSP</span>
+            <span class="feature-pill">HTTP 5xx</span>
+            <span class="feature-pill">DLR / Delay</span>
+            <span class="feature-pill">Network P2P</span>
+            <span class="feature-pill">Traffic Trend</span>
+            <span class="feature-pill">Auto-save</span>
+          </div>
+          <div class="tool-card-cta">
+            <span class="tool-card-open">
+              Open Tool
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 3: MNP Status Reporter -->
+        <div class="tool-card"
+             style="--card-accent: #92400E; --card-bg: #FFFBEB; --card-bdr: #FCD34D;"
+             onclick="openTool('mnp')">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2.5"/>
+                <path d="M8 21h8M12 17v4M6 7h4M6 11h8"/>
+              </svg>
+            </div>
+            <span class="tool-card-badge">Nagios</span>
+          </div>
+          <div class="tool-card-name">MNP Status Reporter</div>
+          <div class="tool-card-tagline">Infrastructure Monitoring</div>
+          <div class="tool-card-desc">Raw Nagios output paste করলেই structured dashboard এবং WhatsApp-ready report তৈরি হয়। Disk, Memory, Swap সব এক জায়গায়।</div>
+          <div class="tool-card-features">
+            <span class="feature-pill">Disk ≤ 20%</span>
+            <span class="feature-pill">Memory Usage</span>
+            <span class="feature-pill">Swap Status</span>
+            <span class="feature-pill">WA Copy</span>
+            <span class="feature-pill">Filter/Search</span>
+          </div>
+          <div class="tool-card-cta">
+            <span class="tool-card-open">
+              Open Tool
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 4: ANS Traffic Report -->
+        <div class="tool-card"
+             style="--card-accent: #00A878; --card-bg: #F0FDF9; --card-bdr: #86EFCD;"
+             onclick="openTool('ans')">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"/>
+                <path d="m7 16 4-4 4 4 4-4"/>
+              </svg>
+            </div>
+            <span class="tool-card-badge">Kibana</span>
+          </div>
+          <div class="tool-card-name">ANS Traffic Report</div>
+          <div class="tool-card-tagline">MNO · IPTSP · Daily CDR</div>
+          <div class="tool-card-desc">Kibana থেকে document count enter করলেই MNO ও IPTSP CDR daily traffic report তৈরি হয়। Google Sheets paste-ready format।</div>
+          <div class="tool-card-features">
+            <span class="feature-pill">4 MNO</span>
+            <span class="feature-pill">18 IPTSP</span>
+            <span class="feature-pill">Success/Error</span>
+            <span class="feature-pill">Sheets Copy</span>
+            <span class="feature-pill">CSV Export</span>
+          </div>
+          <div class="tool-card-cta">
+            <span class="tool-card-open">
+              Open Tool
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+      </div><!-- /tools-grid -->
+
+      <div class="info-strip">
+        <div class="info-strip-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+        </div>
+        <p class="info-strip-text">
+          <strong>GitHub Pages এ deploy করুন:</strong> এই পুরো folder টি (index.html + 4টি subfolder) একটা repository তে upload করুন → Settings → Pages → main branch → Save। তাহলে <code>username.github.io/ops-hub/</code> — এই একটাই link দিয়ে সব tool access করা যাবে।
+        </p>
+      </div>
+
+    </div><!-- /dashboard -->
+
+    <!-- ── TOOL VIEWERS ──────────────────────── -->
+
+    <div class="tool-viewer" id="viewer-daily">
+      <div class="tool-viewer-bar">
+        <button class="tool-viewer-back" onclick="showDashboard()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 4L6 8l4 4"/>
+          </svg>
+          Dashboard
+        </button>
+        <div class="tool-viewer-dot" style="background: var(--c-daily);"></div>
+        <div class="tool-viewer-name">Daily Shift Report</div>
+        <span class="tool-viewer-sub">v2.9.0 · ELK CSV · WhatsApp Report</span>
+      </div>
+      <div class="tool-iframe-wrap">
+        <div class="iframe-loading" id="loading-daily">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading tool…</div>
+        </div>
+        <iframe class="tool-iframe" id="iframe-daily" title="Daily Shift Report" onload="onIframeLoad('daily')"></iframe>
+      </div>
+    </div>
+
+    <div class="tool-viewer" id="viewer-morning">
+      <div class="tool-viewer-bar">
+        <button class="tool-viewer-back" onclick="showDashboard()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 4L6 8l4 4"/>
+          </svg>
+          Dashboard
+        </button>
+        <div class="tool-viewer-dot" style="background: var(--c-morning);"></div>
+        <div class="tool-viewer-name">Morning Shift Report</div>
+        <span class="tool-viewer-sub">v2.8.0 · Shift Handover · Google Sheets</span>
+      </div>
+      <div class="tool-iframe-wrap">
+        <div class="iframe-loading" id="loading-morning">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading tool…</div>
+        </div>
+        <iframe class="tool-iframe" id="iframe-morning" title="Morning Shift Report" onload="onIframeLoad('morning')"></iframe>
+      </div>
+    </div>
+
+    <div class="tool-viewer" id="viewer-mnp">
+      <div class="tool-viewer-bar">
+        <button class="tool-viewer-back" onclick="showDashboard()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 4L6 8l4 4"/>
+          </svg>
+          Dashboard
+        </button>
+        <div class="tool-viewer-dot" style="background: var(--c-mnp);"></div>
+        <div class="tool-viewer-name">MNP Status Reporter</div>
+        <span class="tool-viewer-sub">Nagios · Disk / Memory / Swap</span>
+      </div>
+      <div class="tool-iframe-wrap">
+        <div class="iframe-loading" id="loading-mnp">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading tool…</div>
+        </div>
+        <iframe class="tool-iframe" id="iframe-mnp" title="MNP Status Reporter" onload="onIframeLoad('mnp')"></iframe>
+      </div>
+    </div>
+
+    <div class="tool-viewer" id="viewer-ans">
+      <div class="tool-viewer-bar">
+        <button class="tool-viewer-back" onclick="showDashboard()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 4L6 8l4 4"/>
+          </svg>
+          Dashboard
+        </button>
+        <div class="tool-viewer-dot" style="background: var(--c-ans);"></div>
+        <div class="tool-viewer-name">ANS Traffic Report</div>
+        <span class="tool-viewer-sub">Kibana · MNO/IPTSP CDR · Google Sheets</span>
+      </div>
+      <div class="tool-iframe-wrap">
+        <div class="iframe-loading" id="loading-ans">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Loading tool…</div>
+        </div>
+        <iframe class="tool-iframe" id="iframe-ans" title="ANS Traffic Report" onload="onIframeLoad('ans')"></iframe>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   OpsHub · Navigation Logic
+═══════════════════════════════════════ */
+
+const TOOLS = {
+  daily:   { path: 'daily_report/index.html',   nav: 'nav-daily' },
+  morning: { path: 'morning_shift/index.html',  nav: 'nav-morning' },
+  mnp:     { path: 'mnp_status/index.html',     nav: 'nav-mnp' },
+  ans:     { path: 'ans_traffic/index.html',    nav: 'nav-ans' },
+};
+
+const loaded = {}; // track which iframes are loaded
+
+function setActiveNav(id) {
+  document.querySelectorAll('.tool-nav-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function hideAllViewers() {
+  document.querySelectorAll('.tool-viewer').forEach(v => v.classList.remove('active'));
+}
+
+function showDashboard() {
+  hideAllViewers();
+  document.getElementById('dashboard').classList.remove('hidden');
+  setActiveNav('nav-home');
+  document.title = 'OpsHub · Service Assurance — Infozillion Teletech';
+}
+
+function openTool(key) {
+  const tool = TOOLS[key];
+  if (!tool) return;
+
+  // hide dashboard, hide other viewers
+  document.getElementById('dashboard').classList.add('hidden');
+  hideAllViewers();
+
+  // show this viewer
+  const viewer = document.getElementById('viewer-' + key);
+  viewer.classList.add('active');
+
+  // load iframe once
+  if (!loaded[key]) {
+    const iframe = document.getElementById('iframe-' + key);
+    const loadingEl = document.getElementById('loading-' + key);
+    loadingEl.classList.remove('hidden');
+    iframe.src = tool.path;
+    loaded[key] = true;
+  }
+
+  setActiveNav(tool.nav);
+  document.title = viewer.querySelector('.tool-viewer-name').textContent + ' · OpsHub';
+}
+
+function onIframeLoad(key) {
+  const loadingEl = document.getElementById('loading-' + key);
+  if (loadingEl) {
+    // slight delay for paint
+    setTimeout(() => loadingEl.classList.add('hidden'), 200);
+  }
+}
+
+/* ── CLOCK ── */
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const el = document.getElementById('clock');
+  if (el) el.textContent = `${h}:${m}:${s}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ── KEYBOARD SHORTCUT: 1–4 to open tools ── */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === '1') openTool('daily');
+  else if (e.key === '2') openTool('morning');
+  else if (e.key === '3') openTool('mnp');
+  else if (e.key === '4') openTool('ans');
+  else if (e.key === 'Escape') showDashboard();
+});
+</script>
+
+</body>
+</html>

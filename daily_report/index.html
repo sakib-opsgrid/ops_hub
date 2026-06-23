@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Assurance · Shift Report Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <rect x="1" y="1" width="8" height="8" fill="currentColor" opacity="1"/>
+          <rect x="11" y="1" width="8" height="8" fill="currentColor" opacity="0.5"/>
+          <rect x="1" y="11" width="8" height="8" fill="currentColor" opacity="0.5"/>
+          <rect x="11" y="11" width="8" height="8" fill="currentColor" opacity="0.25"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Infozillion Teletech Bd Ltd</span>
+        <span class="brand-org">Service Assurance · Shift Report Tool</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="version-badge">v2.9.0</span>
+      <span class="header-clock" id="clock"></span>
+      <button class="btn-reset" onclick="resetAll(this)">Reset</button>
+    </div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('9xxx',this)">9xxx Report</button>
+  <button class="tab-btn" onclick="switchTab('1xxx',this)">1xxx Report</button>
+  <button class="tab-btn" onclick="switchTab('4xx5xx',this)">4xx/5xx Report</button>
+  <button class="tab-btn" onclick="switchTab('dlr',this)">DLR Report</button>
+  <button class="tab-btn" onclick="switchTab('delay',this)">Delay Report</button>
+  <button class="tab-btn" onclick="switchTab('backup',this)">Drive Backup</button>
+</nav>
+
+<!-- ═══════════ 9XXX ═══════════ -->
+<div class="tab-panel active" id="panel-9xxx">
+<div class="content">
+  <div class="section-head">
+    <h2>9xxx <em>Error Report</em></h2>
+    <span class="section-badge">a2pResponseCode</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Monitoring Window</span></div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field-block"><label>From</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="9xxx-from-date"><input class="field-input" type="time" id="9xxx-from-time"></div></div>
+        <div class="field-block"><label>To</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="9xxx-to-date"><input class="field-input" type="time" id="9xxx-to-time"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">CSV Upload</span></div>
+    <div class="card-body">
+      <div class="upload-cols">
+        <div>
+          <div class="upload-tag">MNO</div>
+          <div class="upload-zone" id="zone-9mno">
+            <input type="file" accept=".csv" onchange="parse9xxx(this.files[0],'mno')">
+            <div class="upload-zone__inner">
+              <div class="upload-icon">📂</div>
+              <div class="upload-label">Drop <strong>MNO CSV</strong> or click</div>
+              <div class="upload-status" id="status-9mno"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="upload-tag">IPTSP</div>
+          <div class="upload-zone" id="zone-9iptsp">
+            <input type="file" accept=".csv" onchange="parse9xxx(this.files[0],'iptsp')">
+            <div class="upload-zone__inner">
+              <div class="upload-icon">📂</div>
+              <div class="upload-label">Drop <strong>IPTSP CSV</strong> or click</div>
+              <div class="upload-status" id="status-9iptsp"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub tabs -->
+  <div class="seg-control">
+    <button class="seg-btn seg-btn--active" id="9sub-mno-btn" onclick="show9sub('mno',this)">MNO</button>
+    <button class="seg-btn" id="9sub-iptsp-btn" onclick="show9sub('iptsp',this)">IPTSP</button>
+  </div>
+
+  <div id="9sub-mno">
+    <div class="pivot-wrap" id="pivot-9mno"><div class="no-data">Upload MNO CSV to generate pivot table</div></div>
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header"><span class="card-title">Report Info — MNO</span></div>
+      <div class="card-body">
+        <div class="field-stack">
+          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="9mno-reporter" placeholder="e.g. Name"></div>
+          <div class="field-block"><label>Status</label>
+            <div class="status-row">
+              <button class="st-btn normal-on" id="9mno-btn-n" onclick="setSt('9mno','Normal')">Normal</button>
+              <button class="st-btn" id="9mno-btn-i" onclick="setSt('9mno','Issue')">Issue</button>
+            </div>
+          </div>
+        </div>
+        <div id="9mno-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="9mno-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--primary" onclick="buildScreenshot('9mno')">Generate Report Card</button>
+    </div>
+    <div class="screenshot-wrap" id="ss-9mno">
+      <div class="screenshot-label">Preview</div>
+      <div class="screenshot-card" id="sc-9mno"></div>
+      <div class="card-actions">
+        <button class="btn btn--success btn--sm" onclick="captureScreenshot('sc-9mno',false,this)">
+          <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Copy Image
+        </button>
+        <button class="btn btn--outline btn--sm" onclick="captureScreenshot('sc-9mno',true,this)">Download PNG</button>
+        <button class="btn btn--outline btn--sm" onclick="copyReportText('MNO','9mno',this)">Copy Text</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="9sub-iptsp" style="display:none;">
+    <div class="pivot-wrap" id="pivot-9iptsp"><div class="no-data">Upload IPTSP CSV to generate pivot table</div></div>
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header"><span class="card-title">Report Info — IPTSP</span></div>
+      <div class="card-body">
+        <div class="field-stack">
+          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="9iptsp-reporter" placeholder="e.g. Name"></div>
+          <div class="field-block"><label>Status</label>
+            <div class="status-row">
+              <button class="st-btn normal-on" id="9iptsp-btn-n" onclick="setSt('9iptsp','Normal')">Normal</button>
+              <button class="st-btn" id="9iptsp-btn-i" onclick="setSt('9iptsp','Issue')">Issue</button>
+            </div>
+          </div>
+        </div>
+        <div id="9iptsp-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="9iptsp-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--primary" onclick="buildScreenshot('9iptsp')">Generate Report Card</button>
+    </div>
+    <div class="screenshot-wrap" id="ss-9iptsp">
+      <div class="screenshot-label">Preview</div>
+      <div class="screenshot-card" id="sc-9iptsp"></div>
+      <div class="card-actions">
+        <button class="btn btn--success btn--sm" onclick="captureScreenshot('sc-9iptsp',false,this)">
+          <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Copy Image
+        </button>
+        <button class="btn btn--outline btn--sm" onclick="captureScreenshot('sc-9iptsp',true,this)">Download PNG</button>
+        <button class="btn btn--outline btn--sm" onclick="copyReportText('IPTSP','9iptsp',this)">Copy Text</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ 1XXX ═══════════ -->
+<div class="tab-panel" id="panel-1xxx">
+<div class="content">
+  <div class="section-head">
+    <h2>1xxx <em>Error Report</em></h2>
+    <span class="section-badge">ansResponseCode</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Monitoring Window</span></div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field-block"><label>From</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="1xxx-from-date"><input class="field-input" type="time" id="1xxx-from-time"></div></div>
+        <div class="field-block"><label>To</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="1xxx-to-date"><input class="field-input" type="time" id="1xxx-to-time"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">CSV Upload</span></div>
+    <div class="card-body">
+      <div class="upload-cols">
+        <div>
+          <div class="upload-tag">MNO</div>
+          <div class="upload-zone" id="zone-1mno">
+            <input type="file" accept=".csv" onchange="parse1xxx(this.files[0],'mno')">
+            <div class="upload-zone__inner">
+              <div class="upload-icon">📂</div>
+              <div class="upload-label">Drop <strong>MNO CSV</strong> or click</div>
+              <div class="upload-status" id="status-1mno"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="upload-tag">IPTSP</div>
+          <div class="upload-zone" id="zone-1iptsp">
+            <input type="file" accept=".csv" onchange="parse1xxx(this.files[0],'iptsp')">
+            <div class="upload-zone__inner">
+              <div class="upload-icon">📂</div>
+              <div class="upload-label">Drop <strong>IPTSP CSV</strong> or click</div>
+              <div class="upload-status" id="status-1iptsp"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="seg-control">
+    <button class="seg-btn seg-btn--active" id="1sub-mno-btn" onclick="show1sub('mno',this)">MNO</button>
+    <button class="seg-btn" id="1sub-iptsp-btn" onclick="show1sub('iptsp',this)">IPTSP</button>
+  </div>
+
+  <div id="1sub-mno">
+    <div class="pivot-wrap" id="pivot-1mno"><div class="no-data">Upload MNO CSV to generate pivot table</div></div>
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header"><span class="card-title">Report Info — MNO</span></div>
+      <div class="card-body">
+        <div class="field-stack">
+          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="1mno-reporter" placeholder="e.g. Name"></div>
+          <div class="field-block"><label>Status</label>
+            <div class="status-row">
+              <button class="st-btn normal-on" id="1mno-btn-n" onclick="setSt('1mno','Normal')">Normal</button>
+              <button class="st-btn" id="1mno-btn-i" onclick="setSt('1mno','Issue')">Issue</button>
+            </div>
+          </div>
+        </div>
+        <div id="1mno-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="1mno-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--primary" onclick="buildScreenshot1('1mno')">Generate Report Card</button>
+    </div>
+    <div class="screenshot-wrap" id="ss-1mno">
+      <div class="screenshot-label">Preview</div>
+      <div class="screenshot-card" id="sc-1mno"></div>
+      <div class="card-actions">
+        <button class="btn btn--success btn--sm" onclick="captureScreenshot('sc-1mno',false,this)">
+          <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Copy Image
+        </button>
+        <button class="btn btn--outline btn--sm" onclick="captureScreenshot('sc-1mno',true,this)">Download PNG</button>
+        <button class="btn btn--outline btn--sm" onclick="copyReportText('MNO','1mno',this)">Copy Text</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="1sub-iptsp" style="display:none;">
+    <div class="pivot-wrap" id="pivot-1iptsp"><div class="no-data">Upload IPTSP CSV to generate pivot table</div></div>
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header"><span class="card-title">Report Info — IPTSP</span></div>
+      <div class="card-body">
+        <div class="field-stack">
+          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="1iptsp-reporter" placeholder="e.g. Name"></div>
+          <div class="field-block"><label>Status</label>
+            <div class="status-row">
+              <button class="st-btn normal-on" id="1iptsp-btn-n" onclick="setSt('1iptsp','Normal')">Normal</button>
+              <button class="st-btn" id="1iptsp-btn-i" onclick="setSt('1iptsp','Issue')">Issue</button>
+            </div>
+          </div>
+        </div>
+        <div id="1iptsp-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="1iptsp-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--primary" onclick="buildScreenshot1('1iptsp')">Generate Report Card</button>
+    </div>
+    <div class="screenshot-wrap" id="ss-1iptsp">
+      <div class="screenshot-label">Preview</div>
+      <div class="screenshot-card" id="sc-1iptsp"></div>
+      <div class="card-actions">
+        <button class="btn btn--success btn--sm" onclick="captureScreenshot('sc-1iptsp',false,this)">
+          <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Copy Image
+        </button>
+        <button class="btn btn--outline btn--sm" onclick="captureScreenshot('sc-1iptsp',true,this)">Download PNG</button>
+        <button class="btn btn--outline btn--sm" onclick="copyReportText('IPTSP','1iptsp',this)">Copy Text</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ 4XX/5XX ═══════════ -->
+<div class="tab-panel" id="panel-4xx5xx">
+<div class="content">
+  <div class="section-head">
+    <h2>4xx / 5xx <em>HTTP Report</em></h2>
+    <span class="section-badge">Source Hits</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Monitoring Window</span></div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field-block"><label>From</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="http-from-date"><input class="field-input" type="time" id="http-from-time"></div></div>
+        <div class="field-block"><label>To</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="http-to-date"><input class="field-input" type="time" id="http-to-time"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">CSV Upload <span style="color:var(--text-tertiary);font-weight:400;">— Optional</span></span></div>
+    <div class="card-body">
+      <div class="upload-zone" id="zone-http">
+        <input type="file" accept=".csv" onchange="parseHTTPcsv(this.files[0])">
+        <div class="upload-zone__inner">
+          <div class="upload-icon">📂</div>
+          <div class="upload-label">Drop <strong>HTTP CSV</strong> or click — requires <code>ans_type</code> and <code>event.original</code></div>
+          <div class="upload-status" id="status-http"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Source Breakdown — GP → ICC</span></div>
+    <div class="card-body">
+      <div class="src-grid" id="http-source-list"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Report Info</span></div>
+    <div class="card-body">
+      <div class="field-stack">
+        <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="http-reporter" placeholder="e.g. Name"></div>
+        <div class="field-block"><label>Status</label>
+          <div class="status-row">
+            <button class="st-btn normal-on" id="http-btn-n" onclick="setSt('http','Normal')">Normal</button>
+            <button class="st-btn" id="http-btn-i" onclick="setSt('http','Issue')">Issue</button>
+          </div>
+        </div>
+      </div>
+      <div id="http-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="http-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn--primary" onclick="generateHTTP()">Generate for WhatsApp</button>
+  </div>
+
+  <div id="http-output" style="display:none;margin-top:1.25rem;">
+    <div class="screenshot-wrap show">
+      <div class="screenshot-label">Preview</div>
+      <div class="screenshot-card" id="sc-http"></div>
+      <div class="card-actions">
+        <button class="btn btn--outline btn--sm" onclick="doCopy('http-full-text', this)">📄 Copy Text</button>
+      </div>
+    </div>
+    <pre id="http-full-text" style="display:none;"></pre>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ DLR ═══════════ -->
+<div class="tab-panel" id="panel-dlr">
+<div class="content">
+  <div class="section-head">
+    <h2>DLR <em>Report</em></h2>
+    <span class="section-badge">statusCode</span>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Monitoring Window</span></div>
+    <div class="card-body">
+      <div class="field-grid">
+        <div class="field-block"><label>From</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="dlr-from-date"><input class="field-input" type="time" id="dlr-from-time"></div></div>
+        <div class="field-block"><label>To</label>
+          <div class="dt-wrap"><input class="field-input" type="date" id="dlr-to-date"><input class="field-input" type="time" id="dlr-to-time"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">CSV Upload</span></div>
+    <div class="card-body">
+      <div class="upload-zone" id="zone-dlr">
+        <input type="file" accept=".csv" onchange="parseDLR(this.files[0])">
+        <div class="upload-zone__inner">
+          <div class="upload-icon">📂</div>
+          <div class="upload-label">Drop <strong>DLR CSV</strong> or click — requires <code>message_body</code></div>
+          <div class="upload-status" id="status-dlr"></div>
+        </div>
+      </div>
+      <div class="dlr-grid" style="margin-top:1.25rem;" id="dlr-counts-box"></div>
+      <div id="dlr-manual-box" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Report Info</span></div>
+    <div class="card-body">
+      <div class="field-stack">
+        <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="dlr-reporter" placeholder="e.g. Name"></div>
+        <div class="field-block"><label>Status</label>
+          <div class="status-row">
+            <button class="st-btn normal-on" id="dlr-btn-n" onclick="setSt('dlr','Normal')">Normal</button>
+            <button class="st-btn" id="dlr-btn-i" onclick="setSt('dlr','Issue')">Issue</button>
+          </div>
+        </div>
+      </div>
+      <div id="dlr-issue-box" style="margin-top:1rem;display:none;"><textarea class="field-input" id="dlr-issue" placeholder="Issue details…" style="min-height:60px;resize:vertical;"></textarea></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn--primary" onclick="buildDLRScreenshot()">Generate Report Card</button>
+  </div>
+
+  <div class="screenshot-wrap" id="ss-dlr">
+    <div class="screenshot-label">Preview</div>
+    <div class="screenshot-card" id="sc-dlr"></div>
+    <div class="card-actions">
+      <button class="btn btn--success btn--sm" onclick="captureScreenshot('sc-dlr',false,this)">
+        <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Copy Image
+      </button>
+      <button class="btn btn--outline btn--sm" onclick="captureScreenshot('sc-dlr',true,this)">Download PNG</button>
+      <button class="btn btn--outline btn--sm" onclick="copyDLRText(this)">Copy Text</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ DELAY ═══════════ -->
+<div class="tab-panel" id="panel-delay">
+<div class="content">
+
+  <!-- Upload state -->
+  <div id="delay-screen-upload">
+    <div class="delay-upload-hero">
+      <div class="delay-eyebrow">Elastic Stack Export</div>
+      <h1 class="delay-headline">Analyze SMS<br><em>Response Delays</em></h1>
+      <p class="delay-subtext">Upload your CSV export from Kibana. The tool computes per-operator delay distribution and generates a shareable report card.</p>
+    </div>
+
+    <div class="delay-upload-zone" id="delay-dropZone">
+      <input type="file" id="delay-fileInput" accept=".csv" hidden>
+      <div class="delay-upload-zone__inner">
+        <div class="delay-zone-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M16 4v16M10 10l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 22v2a4 4 0 004 4h16a4 4 0 004-4v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="delay-zone-label">Drop CSV file here</div>
+        <div class="delay-zone-hint">or</div>
+        <button class="btn btn--primary btn--sm" id="delay-browseBtn" type="button">Browse File</button>
+        <div class="delay-zone-formats">Accepts <code>.csv</code> — Kibana / Elastic discover export</div>
+      </div>
+    </div>
+
+    <div class="req-box">
+      <div class="req-box-title">Required CSV columns</div>
+      <div class="req-grid">
+        <div class="req-item"><code>ansRequestTime</code><span>Request timestamp</span></div>
+        <div class="req-item"><code>ansResponseTime</code><span>Response timestamp</span></div>
+        <div class="req-item"><code>applicableSmsGateway</code><span>Operator name</span></div>
+        <div class="req-item req-item--opt"><code>@timestamp</code><span>Optional — for time range</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div id="delay-screen-loading" style="display:none;">
+    <div class="loading-wrap">
+      <div class="loading-spinner">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="16" stroke="var(--border)" stroke-width="3"/>
+          <path d="M20 4a16 16 0 0116 16" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="loading-label" id="delay-loadingLabel">Reading file…</div>
+      <div class="loading-bar"><div class="loading-bar__fill" id="delay-loadingFill"></div></div>
+    </div>
+  </div>
+
+  <!-- Results state -->
+  <div id="delay-results" class="delay-results">
+    <div class="results-bar">
+      <div class="results-bar__left">
+        <button class="btn btn--ghost btn--sm" id="delay-resetBtn" type="button">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 7a5 5 0 105-5H4m0 0L2 4m2-2L2 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New File
+        </button>
+        <div class="results-meta" id="delay-resultsMeta"></div>
+      </div>
+      <div class="results-bar__right">
+        <button class="btn btn--outline btn--sm" id="delay-copyTableBtn" type="button">Copy Table</button>
+        <button class="btn btn--outline btn--sm" id="delay-exportCsvBtn" type="button">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="time-range-bar" id="delay-timeRange"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Delay Distribution</span>
+        <span style="font-size:0.72rem;color:var(--text-tertiary);">Count of messages per delay value (seconds) × operator</span>
+      </div>
+      <div class="card-body" style="padding:0;overflow-x:auto;">
+        <table class="pivot-table" id="delay-pivotTable" style="min-width:600px;">
+          <thead></thead><tbody></tbody><tfoot></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Operator Summary</span>
+      </div>
+      <div class="op-cards" id="delay-opCards"></div>
+    </div>
+
+    <div class="card" style="overflow:visible;">
+      <div class="card-header"><span class="card-title">WhatsApp Report Card</span></div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-block"><label>Report Type</label><input class="field-input" type="text" id="delay-fReportType" value="Delay Report" placeholder="e.g. Delay Report"></div>
+          <div class="field-block"><label>Reporter Name</label><input class="field-input" type="text" id="delay-fReporter" placeholder="e.g. Rizvi"></div>
+        </div>
+        <div class="field-grid" style="margin-top:1rem;">
+          <div class="field-block"><label>Status</label>
+            <select class="field-input" id="delay-fStatus" style="cursor:pointer;">
+              <option value="Normal">Normal</option>
+              <option value="Issue">Issue</option>
+            </select>
+          </div>
+          <div class="field-block" id="delay-fIssueGroup" style="display:none;">
+            <label>Issue Description</label>
+            <input class="field-input" type="text" id="delay-fIssue" placeholder="Describe the issue…">
+          </div>
+        </div>
+        <div class="field-grid" style="margin-top:1rem;">
+          <div class="field-block">
+            <label>From <span id="delay-fromHint" style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-tertiary);text-transform:none;letter-spacing:0;">auto from CSV</span></label>
+            <input class="field-input" type="datetime-local" id="delay-fFrom">
+          </div>
+          <div class="field-block">
+            <label>To <span id="delay-toHint" style="font-family:var(--font-mono);font-size:0.62rem;color:var(--text-tertiary);text-transform:none;letter-spacing:0;">auto from CSV</span></label>
+            <input class="field-input" type="datetime-local" id="delay-fTo">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn--primary" id="delay-generateBtn" type="button">Generate Report Card</button>
+        </div>
+      </div>
+
+      <div id="delay-cardPreview" style="display:none;padding:1.5rem;background:var(--surface-2);border-top:1px solid var(--border);">
+        <div class="screenshot-label" style="margin-bottom:1rem;">Preview</div>
+        <div class="delay-report-card" id="delay-reportCard"></div>
+        <div class="card-actions" style="margin-top:1rem;">
+          <button class="btn btn--success btn--sm" id="delay-copyImgBtn" type="button">
+            <svg width="14" height="14" viewBox="0 0 15 15" fill="none"><rect x="1" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Copy Image
+          </button>
+          <button class="btn btn--outline btn--sm" id="delay-downloadImgBtn" type="button">Download PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════ DRIVE BACKUP ═══════════ -->
+<div class="tab-panel" id="panel-backup">
+<div class="content">
+  <div class="section-head">
+    <h2>Drive <em>Backup</em></h2>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Download All CSVs</span></div>
+    <div class="card-body">
+      <p style="font-size:0.82rem;color:var(--text-secondary);line-height:1.65;margin-bottom:1.25rem;">Downloads all uploaded CSV files with standardised names based on each report's monitoring window start time.</p>
+      <div id="save-file-list"></div>
+      <div class="btn-row">
+        <button class="btn btn--primary" onclick="downloadAllFiles()">⬇ Download All (4 files)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Drive Folder</span></div>
+    <div class="card-body">
+      <a href="https://drive.google.com/drive/u/0/folders/1UmbAbuKVIX_aU7-h-GrQDQIabaByHR8H" target="_blank" class="btn btn--outline btn--sm">Open Drive Folder ↗</a>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <span>© 2026 Najmaz Sakib</span>
+  <span class="sep">·</span>
+  <span>Infozillion Teletech Bd Ltd — Service Assurance</span>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+</body>
+</html>
