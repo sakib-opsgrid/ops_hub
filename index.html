@@ -534,35 +534,7 @@ body {
 /* ── DASHBOARD active state (hidden when tool open) ── */
 .hub-dashboard.hidden { display: none; }
 
-/* ── INFO STRIP ─────────────────────────────── */
-.info-strip {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 18px 22px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
 
-.info-strip-icon {
-  width: 36px; height: 36px;
-  background: var(--surface-2);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-2);
-  flex-shrink: 0;
-}
-
-.info-strip-text {
-  font-size: 13px;
-  color: var(--text-2);
-  line-height: 1.6;
-}
-
-.info-strip-text strong { color: var(--text); }
 
 /* ── RESPONSIVE ─────────────────────────────── */
 @media (max-width: 768px) {
@@ -820,17 +792,7 @@ body {
 
       </div><!-- /tools-grid -->
 
-      <div class="info-strip">
-        <div class="info-strip-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 16v-4M12 8h.01"/>
-          </svg>
-        </div>
-        <p class="info-strip-text">
-          <strong>GitHub Pages এ deploy করুন:</strong> এই পুরো folder টি (index.html + 4টি subfolder) একটা repository তে upload করুন → Settings → Pages → main branch → Save। তাহলে <code>username.github.io/ops-hub/</code> — এই একটাই link দিয়ে সব tool access করা যাবে।
-        </p>
-      </div>
+
 
     </div><!-- /dashboard -->
 
