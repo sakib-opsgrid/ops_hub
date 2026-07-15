@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP Whitelist Request — Infozillion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="style.css">
+
+<!-- OpsHub integration: hide header instantly when loaded inside hub -->
+<script>
+(function(){
+  if(window.location.search.includes('hub=1')||window.self!==window.top){
+    document.documentElement.classList.add('in-hub');
+  }
+})();
+</script>
+<style>
+.in-hub .unified-header,
+.in-hub .site-header,
+.in-hub .app-header,
+.in-hub .app-bar,
+.in-hub .page-header{
+  display:none!important;
+  height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+}
+.in-hub .tab-nav{ top:0!important; }
+.in-hub{ --topbar:0px!important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="unified-header">
+  <div class="uh-icon" style="background:#EFF8FF;border-color:#BAE0FD;color:#0369A1">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+  </div>
+  <div class="uh-info">
+    <div class="uh-title">Infozillion Teletech Bd Ltd <span class="uh-badge" style="background:#EFF8FF;border:1px solid #BAE0FD;color:#0369A1">v1.6.0</span></div>
+    <div class="uh-sub">Service Assurance · IP Whitelist Request · Activate / Deactivate</div>
+  </div>
+  <div class="uh-actions">
+    <button class="uh-btn" onclick="resetTool()">&#8635; Reset</button>
+  </div>
+</header>
+
+  <!-- Activate Card -->
+  <div class="card">
+    <div class="card-title activate"><span class="step-num">1</span> Activate — IP Address(es)</div>
+    <div class="card-hint">Add as many IP fields as needed, then check location for all of them at once.</div>
+
+    <div id="activateRows">
+      <div class="ip-row"><input type="text" class="activate-ip-input" placeholder="e.g. 123.176.58.62"><button class="row-remove" onclick="removeRow(this)">✕</button></div>
+    </div>
+    <button class="btn btn-add btn-sm" onclick="addRow('activateRows','activate-ip-input')">+ Add IP field</button>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="checkBtn" onclick="checkActivateLocations()">Check Location (All)</button>
+    </div>
+    <div class="status" id="checkStatus"></div>
+
+    <div id="activateResults">
+      <div id="captureArea"></div>
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="downloadImage()">⬇ Download Image (All)</button>
+        <button class="btn btn-outline" onclick="window.open('https://drive.google.com/drive/folders/1caDvd-3Q37Q8uTfZAVzW7f86aGbVDaQF?usp=sharing','_blank')">📁 Open Drive Folder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deactivate Card -->
+  <div class="card">
+    <div class="card-title deactivate"><span class="step-num">2</span> Deactivate — IP Address(es)</div>
+    <div class="card-hint">No location check needed for deactivation.</div>
+
+    <div id="deactivateRows">
+      <div class="ip-row"><input type="text" class="deactivate-ip-input" placeholder="e.g. 161.248.247.211"><button class="row-remove" onclick="removeRow(this)">✕</button></div>
+    </div>
+    <button class="btn btn-add deactivate-add btn-sm" onclick="addRow('deactivateRows','deactivate-ip-input')">+ Add IP field</button>
+  </div>
+
+  <!-- Request Details -->
+  <div class="card">
+    <div class="card-title"><span class="step-num neutral">3</span> Request Details</div>
+    <div class="row">
+      <div>
+        <label for="senderName">Your Name</label>
+        <input type="text" class="name-input" id="senderName" placeholder="e.g. Najmaz Sakib">
+      </div>
+      <div>
+        <label for="clientName">Client Name</label>
+        <input type="text" id="clientName" placeholder="e.g. DmsHub">
+      </div>
+      <div>
+        <label for="vpnType">VPN / Non-VPN</label>
+        <select id="vpnType">
+          <option value="NON-VPN">NON-VPN</option>
+          <option value="VPN">VPN</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generateOutputs()">Generate Email & WhatsApp Text</button>
+    </div>
+  </div>
+
+  <!-- Outputs -->
+  <div class="card hidden" id="outputCard">
+    <div class="card-title"><span class="step-num neutral">4</span> Copy & Send</div>
+    <div class="output-grid">
+      <div class="output-card">
+        <div class="output-label">Email</div>
+        <div class="output-sub">Subject</div>
+        <div class="output-box" id="emailSubject"></div>
+        <button class="copy-btn" onclick="copyText('emailSubject', this)">Copy Subject</button>
+        <div class="hr"></div>
+        <div class="output-sub">Body</div>
+        <div class="output-box" id="emailBody"></div>
+        <button class="copy-btn" onclick="copyText('emailBody', this)">Copy Body</button>
+      </div>
+      <div class="output-card">
+        <div class="output-label">WhatsApp</div>
+        <div class="output-box" id="waBody"></div>
+        <button class="copy-btn" onclick="copyText('waBody', this)">Copy Message</button>
+      </div>
+    </div>
+  </div>
+
+  
+</div>
+
+<script src="script.js"></script>
+<script>
+window.addEventListener("message", function(e) {
+  if (e.data === "hide-header") {
+    // Reset from hub
+    if (e.data && e.data.type === 'reset-tool') {
+      if (typeof resetTool === 'function') resetTool();
+    }
+
+    var h = document.querySelector("header");
+    if (h) h.style.display = "none";
+  }
+});
+</script>
+</body>
+</html>

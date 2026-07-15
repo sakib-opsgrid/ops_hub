@@ -87,33 +87,35 @@ body {
 /* ══════════════════════════════════════════
    TOP BAR
 ══════════════════════════════════════════ */
-.app-bar {
+.app-bar-old {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--t1);
+  background: var(--surface);
   padding: 0 28px;
   height: var(--topbar);
   position: sticky;
   top: 0;
   z-index: 200;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
 .ab-icon {
   width: 32px; height: 32px; flex-shrink: 0;
-  background: var(--blue);
+  background: var(--blue-lt);
+  border: 1px solid var(--blue-bdr);
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
 }
-.ab-icon svg { width: 17px; height: 17px; stroke: #fff; }
+.ab-icon svg { width: 17px; height: 17px; stroke: var(--blue); }
 
 .ab-title {
   font-size: 0.92rem; font-weight: 600;
-  color: #fff; letter-spacing: -0.01em;
+  color: var(--t1); letter-spacing: -0.01em;
 }
 .ab-sub {
-  font-size: 0.7rem; color: rgba(255,255,255,0.4);
+  font-size: 0.7rem; color: var(--t3);
   font-family: var(--mono);
 }
 
@@ -121,30 +123,30 @@ body {
 
 .back-btn {
   width: 32px; height: 32px; flex-shrink: 0;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: background 0.15s;
-  color: #fff;
+  color: var(--t2);
 }
-.back-btn:hover { background: rgba(255,255,255,0.15); }
-.back-btn svg { width: 15px; height: 15px; stroke: #fff; fill: none; }
+.back-btn:hover { background: var(--surface3); }
+.back-btn svg { width: 15px; height: 15px; stroke: var(--t2); fill: none; }
 
 .ab-actions { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
 
 .icon-btn {
   display: flex; align-items: center; gap: 6px;
   height: 32px; padding: 0 14px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
   cursor: pointer; transition: background 0.15s;
-  font-size: 0.75rem; color: rgba(255,255,255,0.85);
+  font-size: 0.75rem; color: var(--t2);
   font-family: var(--font); font-weight: 500; white-space: nowrap;
 }
-.icon-btn:hover { background: rgba(255,255,255,0.15); }
-.icon-btn svg { width: 13px; height: 13px; stroke: rgba(255,255,255,0.85); fill: none; }
+.icon-btn:hover { background: var(--surface3); border-color: var(--border-md); }
+.icon-btn svg { width: 13px; height: 13px; stroke: var(--t2); fill: none; }
 
 /* ══════════════════════════════════════════
    INPUT SCREEN — TWO COLUMN
@@ -313,8 +315,7 @@ textarea::placeholder { color: var(--t3); line-height: 1.9; }
   grid-template-columns: var(--sidebar) 1fr;
   grid-template-rows: auto 1fr;
   min-height: calc(100vh - var(--topbar));
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* Left sidebar */
@@ -586,3 +587,6 @@ select:focus { border-color: var(--blue); }
   border: 1px solid rgba(255,255,255,0.08);
 }
 .toast.show { opacity: 1; }
+
+/* OpsHub — header hidden when inside hub iframe */
+.hub-hidden { display: none !important; height: 0 !important; overflow: hidden !important; }

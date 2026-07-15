@@ -5,26 +5,7 @@
    ================================================================ */
 
 // ── CLOCK ─────────────────────────────────────────────────────────
-function updateClock(){
-  const n = new Date();
-  const p = s => String(s).padStart(2,'0');
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const mons = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('clock').textContent =
-    `${days[n.getDay()]} ${mons[n.getMonth()]} ${p(n.getDate())}  ${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
-}
-setInterval(updateClock,1000); updateClock();
 
-// ── UTILS ─────────────────────────────────────────────────────────
-const pad = n => String(n).padStart(2,'0');
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('toast--show');
-  setTimeout(()=>t.classList.remove('toast--show'),2800);
-}
 
 function initDT(prefix){
   const n = new Date();
@@ -287,6 +268,7 @@ function copyReportText(typeLabel, prefix, btn){
   const toTime   = document.getElementById(`${isNine?'9xxx':'1xxx'}-to-time`).value;
   const period = `${fmtDT(fromDate,fromTime)} - ${fmtDT(toDate,toTime)}`;
   const text = `${typeLabel},\n${period}\n\nReporter: ${reporter}\nStatus  : ${statusStr}`;
+  showWaModal(text);
   navigator.clipboard.writeText(text).then(()=>{
     const orig=btn.textContent; btn.textContent='Copied ✓';
     setTimeout(()=>btn.textContent=orig,2000);
@@ -1398,3 +1380,27 @@ document.addEventListener('DOMContentLoaded',()=>{
   refreshHTTP();
   initDelay();
 });
+
+/* ── WA Preview Modal ─────────────────────────── */
+function showWaModal(text) {
+  const overlay = document.getElementById('wa-modal-overlay');
+  const pre = document.getElementById('wa-modal-content');
+  if (!overlay || !pre) return;
+  pre.textContent = text;
+  overlay.style.display = 'flex';
+}
+function closeWaModal() {
+  const o = document.getElementById('wa-modal-overlay');
+  if (o) o.style.display = 'none';
+}
+function copyFromModal() {
+  const pre = document.getElementById('wa-modal-content');
+  const btn = document.getElementById('wa-modal-copy-btn');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    if (btn) { btn.textContent = 'Copied ✓'; btn.style.background = '#1A6B3C'; }
+    setTimeout(() => { if(btn){btn.textContent='Copy to Clipboard';btn.style.background='#1A1916';} }, 2000);
+  });
+}
+document.addEventListener('click', e => { const o=document.getElementById('wa-modal-overlay'); if(e.target===o)closeWaModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape')closeWaModal(); });

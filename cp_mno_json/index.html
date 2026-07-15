@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANS Msg JSON — Infozillion Teletech</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg:        #F5F4F0;
+  --surface:   #FFFFFF;
+  --surface-2: #F0EFE9;
+  --border:    #E2E0D8;
+  --border-md: #C8C6BC;
+  --text:      #1A1916;
+  --text-2:    #6B6860;
+  --text-3:    #A8A69E;
+  --accent:    #6D28D9;
+  --accent-2:  #7C3AED;
+  --accent-bg: #F3F0FF;
+  --accent-bdr:#C4B5FD;
+  --accent-dim:rgba(109,40,217,0.08);
+  --ok:        #1A6B3C;
+  --ok-bg:     #EBF7F1;
+  --err:       #B91C1C;
+  --err-bg:    #FEF2F2;
+  --tok-key:   #6D28D9;
+  --tok-str:   #1A6B3C;
+  --tok-num:   #1D4ED8;
+  --tok-bool:  #92400E;
+  --tok-null:  #B91C1C;
+  --font:  'DM Sans', system-ui, sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono:  'DM Mono', 'Courier New', monospace;
+  --r: 12px; --r-sm: 8px;
+  --sh: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.05);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+}
+
+/* ── Compact Tool Header ── */
+.tool-header-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0 10px;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
+.tool-header-left{display:flex;flex-direction:column;gap:3px}
+.tool-header-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.tool-header-title{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-0.02em;line-height:1.2}
+.tool-header-sub{font-size:12px;color:var(--text-2);font-family:var(--mono);line-height:1.5;max-width:520px}
+.tool-header-reset{font-family:var(--mono);font-size:12px;padding:6px 14px;border-radius:8px;border:1px solid var(--accent-bdr);background:var(--accent-dim);color:var(--accent);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s}
+.tool-header-reset:hover{background:var(--accent);color:#fff}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, rgba(109,40,217,0.07) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none; z-index: 0;
+}
+.app {
+  position: relative; z-index: 1;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2rem;
+}
+.page-header { margin-bottom: 0; padding-top: 0.5rem; }
+.header-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent);
+  background: var(--accent-dim); border: 1px solid var(--accent-bdr);
+  border-radius: 4px; padding: 4px 10px; margin-bottom: 12px;
+}
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.page-header h1 {
+  font-family: var(--serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 400; letter-spacing: -0.01em;
+  line-height: 1.15; color: var(--text); margin-bottom: 8px;
+}
+.page-header h1 em { font-style: italic; color: var(--text-2); }
+.page-header .subtitle {
+  font-size: 13px; color: var(--text-2);
+  line-height: 1.65; font-family: var(--mono);
+}
+.version-pill {
+  display: inline-block; font-family: var(--mono);
+  font-size: 11px; font-weight: 500;
+  color: var(--accent); background: var(--accent-dim);
+  border: 1px solid var(--accent-bdr);
+  padding: 2px 8px; border-radius: 20px;
+  vertical-align: middle; margin-left: 8px; position: relative; top: -2px;
+}
+.grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.25rem; align-items: start;
+}
+@media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 1.5rem;
+  box-shadow: var(--sh); position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 100%; height: 3px; background: var(--accent); opacity: 0.7;
+}
+.card.card-out::before { background: var(--text); }
+.card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.step-badge {
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font); font-weight: 700; font-size: 12px;
+  color: #fff; flex-shrink: 0; background: var(--accent);
+}
+.step-badge.secondary { background: var(--text); }
+.card-title { font-size: 14px; font-weight: 600; color: var(--accent); letter-spacing: -0.01em; }
+.card-title.secondary { color: var(--text); }
+.card-desc { font-size: 12px; color: var(--text-3); margin: 0 0 1.1rem 34px; line-height: 1.55; font-family: var(--mono); }
+.field-wrap { margin-left: 34px; }
+textarea#inputArea {
+  width: 100%;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); font-family: var(--mono);
+  font-size: 12.5px; line-height: 1.65; color: var(--text);
+  padding: 0.9rem 1rem; resize: vertical;
+  height: calc(100vh - 220px); min-height: 400px;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+textarea#inputArea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+textarea#inputArea::placeholder { color: var(--text-3); }
+.output-box {
+  width: 100%;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); font-family: var(--mono);
+  font-size: 12.5px; line-height: 1.65; color: var(--text);
+  padding: 0.9rem 1rem;
+  height: calc(100vh - 220px); min-height: 400px;
+  overflow: auto; white-space: pre-wrap; word-break: break-word;
+}
+.empty-state {
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; color: var(--text-3); font-family: var(--font);
+  font-size: 13px; text-align: center; gap: 8px; flex-direction: column;
+}
+.empty-state svg { width: 28px; height: 28px; color: var(--border-md); }
+.tok-key  { color: var(--tok-key);  font-weight: 500; }
+.tok-str  { color: var(--tok-str); }
+.tok-num  { color: var(--tok-num); }
+.tok-bool { color: var(--tok-bool); }
+.tok-null { color: var(--tok-null); }
+.meta-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-left: 34px; margin-top: 8px;
+}
+.meta-text { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.btn-row {
+  display: flex; gap: 8px;
+  margin-left: 34px; margin-top: 14px; flex-wrap: wrap;
+}
+.btn {
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  padding: 8px 16px; border-radius: var(--r-sm);
+  border: 1px solid transparent; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.15s; letter-spacing: -0.01em;
+}
+.btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-2); box-shadow: 0 3px 10px rgba(109,40,217,0.3); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary { background: var(--text); color: #fff; }
+.btn-secondary:hover { background: #2A2926; box-shadow: 0 3px 10px rgba(0,0,0,0.2); transform: translateY(-1px); }
+.btn-secondary:active { transform: translateY(0); }
+.btn-ghost { background: var(--surface); color: var(--text-2); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-md); }
+.btn-danger-ghost { background: var(--surface); color: var(--err); border-color: var(--border); }
+.btn-danger-ghost:hover { background: var(--err-bg); border-color: #FCA5A5; }
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  padding: 3px 10px; border-radius: 20px; letter-spacing: 0.02em;
+}
+.status-badge.ok  { background: var(--ok-bg);  color: var(--ok);  border: 1px solid #B4DEC9; }
+.status-badge.err { background: var(--err-bg); color: var(--err); border: 1px solid #FCA5A5; }
+.status-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+#toastHost {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  z-index: 200; display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  font-family: var(--font); font-size: 13px; font-weight: 500;
+  padding: 10px 16px; border-radius: var(--r-sm);
+  background: var(--text); color: #fff;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  animation: toast-in 0.18s ease-out;
+}
+.toast svg { width: 15px; height: 15px; flex-shrink: 0; }
+.toast.success svg { color: #6EE7B7; }
+.toast.error svg   { color: #FCA5A5; }
+@keyframes toast-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+footer {
+  margin-top: 2.5rem; padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.footer-text { font-family: var(--mono); font-size: 11px; color: var(--text-3); line-height: 1.6; }
+.footer-text span { color: var(--accent); }
+  
+/* ── Unified App Header ── */
+.unified-header{display:flex;align-items:center;gap:14px;background:#fff;padding:0 24px;height:56px;position:sticky;top:0;z-index:200;border-bottom:1px solid #E2E0D8;box-shadow:0 1px 3px rgba(0,0,0,0.06);flex-shrink:0}
+.uh-icon{width:32px;height:32px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid}
+.uh-icon svg{width:17px;height:17px}
+.uh-info{flex:1;min-width:0}
+.uh-title{font-size:0.92rem;font-weight:600;color:#1A1916;letter-spacing:-0.01em;line-height:1.3}
+.uh-sub{font-size:0.7rem;color:#8b94aa;font-family:'DM Mono',monospace;margin-top:1px}
+.uh-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;vertical-align:middle;margin-left:6px;position:relative;top:-1px}
+.uh-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.uh-btn{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#F0EFE9;border:1px solid #E2E0D8;border-radius:8px;cursor:pointer;transition:background 0.15s;font-size:0.75rem;color:#6B6860;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap}
+.uh-btn:hover{background:#E8E6DF;border-color:#C8C6BC;color:#1A1916}
+
+
+/* OpsHub — header hidden when inside hub iframe */
+.hub-hidden { display: none !important; height: 0 !important; overflow: hidden !important; }
+
+</style>
+
+<!-- OpsHub integration: hide header instantly when loaded inside hub -->
+<script>
+(function(){
+  if(window.location.search.includes('hub=1')||window.self!==window.top){
+    document.documentElement.classList.add('in-hub');
+  }
+})();
+</script>
+<style>
+.in-hub .unified-header,
+.in-hub .site-header,
+.in-hub .app-header,
+.in-hub .app-bar,
+.in-hub .page-header{
+  display:none!important;
+  height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+}
+.in-hub .tab-nav{ top:0!important; }
+.in-hub{ --topbar:0px!important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="unified-header" >
+  <div class="uh-icon" style="background:#F3F0FF;border-color:#C4B5FD;color:#6D28D9">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="6" rx="1.5"/><path d="M9 14l2 2 4-4"/></svg>
+  </div>
+  <div class="uh-info">
+    <div class="uh-title">Infozillion Teletech Bd Ltd <span class="uh-badge" style="background:#F3F0FF;border:1px solid #C4B5FD;color:#6D28D9">v2.4</span></div>
+    <div class="uh-sub">Service Assurance · ANS Msg JSON · A2P Log Conversion</div>
+  </div>
+  <div class="uh-actions">
+    <button class="uh-btn" id="headerResetBtn">&#8635; Reset</button>
+  </div>
+</header>
+<div class="grid">
+    <!-- Card 1: Input -->
+    <div class="card">
+      <div class="card-head">
+        <span class="step-badge">1</span>
+        <span class="card-title">Paste — A2P Trans MNO Log (ELK)</span>
+      </div>
+      <p class="card-desc">Paste the raw JSON exported from ELK, then click Convert.</p>
+      <div class="field-wrap">
+        <textarea id="inputArea" placeholder='Paste raw JSON from ELK — { "_index": "...", "fields": { ... } }'></textarea>
+      </div>
+      <div class="meta-row">
+        <span class="meta-text" id="inputMeta">0 lines · 0 chars</span>
+        <span id="inputStatus"></span>
+      </div>
+      <div class="btn-row">
+        <button id="clearBtn" class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/></svg>
+          Clear
+        </button>
+        <button id="convertBtn" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          Convert
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 2: Output -->
+    <div class="card card-out">
+      <div class="card-head">
+        <span class="step-badge secondary">2</span>
+        <span class="card-title secondary">Output — ANS Msg JSON</span>
+      </div>
+      <p class="card-desc">Use this payload as the ANS request body.</p>
+      <div class="field-wrap">
+        <div class="output-box" id="outputWrap">
+          <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 17H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+            Paste a log above and click Convert
+          </div>
+          <span id="outputSpan" style="display:none"></span>
+        </div>
+      </div>
+      <div class="meta-row">
+        <span class="meta-text" id="outputMeta">—</span>
+        <span id="outputStatus"></span>
+      </div>
+      <div class="btn-row">
+        <button id="copyBtn" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy JSON
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+<div id="toastHost"></div>
+<script>
+function convert_json(input_json_log) {
+  const data = JSON.parse(input_json_log);
+
+  // Support both raw ELK format ({ "fields": {...} })
+  // and _source format ({ "_source": {...} })
+  const f = data.fields || {};
+  const s = data._source || {};
+
+  const getVal = (fieldKey, sourceKey) => {
+    // Try fields[] first (ELK table/single doc export)
+    if (f[fieldKey] !== undefined && f[fieldKey] !== null) {
+      const v = Array.isArray(f[fieldKey]) ? f[fieldKey][0] : f[fieldKey];
+      return String(v).replace(/^\"+|\"+$/g, "");
+    }
+    // Fallback to _source
+    const sk = sourceKey || fieldKey;
+    if (s[sk] !== undefined && s[sk] !== null) {
+      return String(s[sk]).replace(/^\"+|\"+$/g, "");
+    }
+    return "";
+  };
+
+  return JSON.stringify({
+    username:      "*",
+    password:      "*",
+    message:       "*",
+    apicode:       getVal("a2pResponseCode"),
+    msisdn:        [getVal("msisdn")],
+    countrycode:   getVal("countrycode"),
+    cli:           getVal("cli"),
+    messagetype:   getVal("messageType"),
+    clienttransid: getVal("ansClientTransactionId"),
+    bill_msisdn:   getVal("billMsisdn"),
+    tran_type:     getVal("transactionType"),
+    request_type:  getVal("uri"),
+    rn_code:       getVal("subscriberRnCode")
+  }, null, 4);
+}
+function syntaxHighlight(json) {
+  if (!json) return "";
+  json = json.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    m => {
+      let c = "tok-num";
+      if (/^"/.test(m)) c = /:$/.test(m) ? "tok-key" : "tok-str";
+      else if (/true|false/.test(m)) c = "tok-bool";
+      else if (/null/.test(m)) c = "tok-null";
+      return `<span class="${c}">${m}</span>`;
+    }
+  );
+}
+function showToast(msg, type="success") {
+  const host = document.getElementById('toastHost');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icon = type==="success"
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>';
+  el.innerHTML = `${icon}<span>${msg}</span>`;
+  host.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s'; el.style.opacity='0'; setTimeout(()=>el.remove(),250); }, 2400);
+}
+const inputArea=document.getElementById('inputArea');
+const outputSpan=document.getElementById('outputSpan');
+const emptyState=document.getElementById('emptyState');
+const inputMeta=document.getElementById('inputMeta');
+const outputMeta=document.getElementById('outputMeta');
+const outputStatus=document.getElementById('outputStatus');
+
+function updateInputMeta() {
+  const v=inputArea.value;
+  const l=v===''?0:v.split('\n').length;
+  inputMeta.textContent=`${l} line${l===1?'':'s'} · ${v.length} char${v.length===1?'':'s'}`;
+}
+function setOutput(f) {
+  if (!f) {
+    outputSpan.style.display='none';
+    emptyState.style.display='flex';
+    outputMeta.textContent='—';
+    outputStatus.innerHTML='';
+    return;
+  }
+  emptyState.style.display='none';
+  outputSpan.style.display='block';
+  outputSpan.innerHTML=syntaxHighlight(f);
+  const l=f.split('\n').length;
+  outputMeta.textContent=`${l} lines · ${f.length} chars`;
+  outputStatus.innerHTML='<span class="status-badge ok"><span class="status-badge-dot"></span>Ready to copy</span>';
+}
+inputArea.addEventListener('input', updateInputMeta);
+document.getElementById('clearBtn').addEventListener('click',()=>{inputArea.value='';updateInputMeta();setOutput('');showToast('Cleared.');});
+document.getElementById('convertBtn').addEventListener('click',()=>{
+  const raw=inputArea.value.trim();
+  if (!raw){showToast('Please paste a log first.','error');return;}
+  try{setOutput(convert_json(raw));showToast('Convert successful!');}
+  catch{outputStatus.innerHTML='<span class="status-badge err"><span class="status-badge-dot"></span>Parse error</span>';showToast('Invalid JSON or unexpected structure.','error');}
+});
+document.getElementById('copyBtn').addEventListener('click',async()=>{
+  const t=outputSpan.textContent.trim();
+  if(!t){showToast('Nothing to copy yet.','error');return;}
+  try{await navigator.clipboard.writeText(t);showToast('Copied!');}catch{showToast('Copy failed.','error');}
+});
+document.getElementById('headerResetBtn').addEventListener('click',()=>{inputArea.value='';updateInputMeta();setOutput('');showToast('Reset done.');});
+updateInputMeta();
+</script>
+<script>
+window.addEventListener("message", function(e) {
+  if (e.data === "hide-header") {
+    // Reset from hub
+    if (e.data && e.data.type === 'reset-tool') {
+      var inp = document.getElementById('inputArea');
+      var out = document.getElementById('outputSpan');
+      var empty = document.getElementById('emptyState');
+      if (inp) { inp.value = ''; }
+
+      if (out) { out.style.display='none'; out.innerHTML=''; }
+      if (empty) empty.style.display='flex';
+    }
+    var h = document.querySelector(".page-header");
+    if (h) h.style.display = "none";
+  }
+});
+</script>
+</body>
+</html>

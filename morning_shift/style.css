@@ -38,29 +38,6 @@
   --shadow:        0 4px 12px rgba(26,25,22,.08), 0 1px 4px rgba(26,25,22,.06);
 }
 
-[data-theme="dark"] {
-  --bg:            #161512;
-  --surface:       #1E1D19;
-  --surface-2:     #28261F;
-  --border:        #38362E;
-  --border-strong: #4A473C;
-
-  --text:          #ECE9E2;
-  --text-2:        #A8A69E;
-  --text-3:        #6B6860;
-
-  --accent:        #ECE9E2;
-
-  --green:         #4ADE80;
-  --green-bg:      #102A1A;
-  --red:           #FB923C;
-  --red-bg:        #2E1B0C;
-  --blue:          #60A5FA;
-  --blue-bg:       #0F1F33;
-
-  --shadow-sm:     0 1px 3px rgba(0,0,0,.3);
-  --shadow:        0 4px 16px rgba(0,0,0,.4);
-}
 
 /* ── RESET ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -89,10 +66,9 @@ code {
   top: 0;
   z-index: 100;
   box-shadow: var(--shadow-sm);
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
   padding: 0 2rem;
-  height: 56px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -104,6 +80,7 @@ code {
 }
 .app-header-left { display: flex; align-items: center; gap: 12px; }
 .app-logo img { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
+.brand-mark { color: var(--text); display:flex; align-items:center; flex-shrink:0; }
 .app-title {
   font-size: 0.88rem;
   font-weight: 600;
@@ -112,20 +89,20 @@ code {
 }
 .app-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   color: var(--text-3);
   letter-spacing: 0.02em;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 .version-badge {
   display: inline-block;
   margin-left: 6px;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 8px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--text-3);
-  font-size: 0.58rem;
+  font-size: 0.65rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   vertical-align: middle;
@@ -766,3 +743,6 @@ textarea { resize: vertical; min-height: 64px; line-height: 1.6; font-size: 0.8r
   .history-panel { width: 100%; }
   .generate-section { flex-direction: column; }
 }
+
+/* OpsHub — header hidden when inside hub iframe */
+.hub-hidden { display: none !important; height: 0 !important; overflow: hidden !important; }

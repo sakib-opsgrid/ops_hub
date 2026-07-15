@@ -3,11 +3,35 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MNP Status Reporter</title>
+<title>MNP Status Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
+
+<!-- OpsHub integration: hide header instantly when loaded inside hub -->
+<script>
+(function(){
+  if(window.location.search.includes('hub=1')||window.self!==window.top){
+    document.documentElement.classList.add('in-hub');
+  }
+})();
+</script>
+<style>
+.in-hub .unified-header,
+.in-hub .site-header,
+.in-hub .app-header,
+.in-hub .app-bar,
+.in-hub .page-header{
+  display:none!important;
+  height:0!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+}
+.in-hub .tab-nav{ top:0!important; }
+.in-hub{ --topbar:0px!important; }
+</style>
 </head>
 <body>
 
@@ -15,15 +39,18 @@
      SCREEN 1 — INPUT
 ════════════════════ -->
 <div id="s-input" class="screen active">
-  <header class="app-bar">
-    <div class="ab-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M8 21h8M12 17v4"/><path d="M6 7h4M6 11h8"/></svg>
-    </div>
-    <div>
-      <div class="ab-title">MNP Status Reporter</div>
-      <div class="ab-sub">Infrastructure Monitoring · Infozillion Teletech BD</div>
-    </div>
-  </header>
+  <header class="unified-header">
+  <div class="uh-icon" style="background:#FFFBEB;border-color:#FCD34D;color:#92400E">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M8 21h8M12 17v4"/><path d="M6 7h4M6 11h8"/></svg>
+  </div>
+  <div class="uh-info">
+    <div class="uh-title">Infozillion Teletech Bd Ltd <span class="uh-badge" style="background:#FFFBEB;border:1px solid #FCD34D;color:#92400E">v1.6</span></div>
+    <div class="uh-sub">Service Assurance · MNP Status Report · Infrastructure Monitoring</div>
+  </div>
+  <div class="uh-actions">
+    <button class="uh-btn" id="mnp-reset-btn">&#8635; Reset</button>
+  </div>
+</header>
 
   <main class="input-main">
 
@@ -93,7 +120,6 @@
         </div>
       </div>
 
-      <p class="copyright">© 2026 Najmaz Sakib · Infozillion Teletech Bd Ltd</p>
     </div>
 
   </main>
@@ -186,7 +212,6 @@
         </div>
       </div>
 
-      <p class="copyright" style="padding:12px 16px;">© 2026 Najmaz Sakib · Infozillion Teletech Bd Ltd</p>
 
     </aside>
 
@@ -201,5 +226,40 @@
 
 <div class="toast" id="toast"></div>
 <script src="app.js"></script>
+<script>
+window.addEventListener("message", function(e) {
+  if (e.data === "hide-header") {
+    var bars = document.querySelectorAll(".app-bar");
+    if (bars[0]) bars[0].style.display = "none";
+    document.documentElement.style.setProperty("--topbar", "0px");
+  }
+  if (e.data && e.data.type === "reset-tool") {
+    // Clear the raw textarea
+    var ta = document.getElementById("raw");
+    if (ta) ta.value = "";
+    // Go back to input screen
+    var report = document.getElementById("report-screen");
+    var input  = document.getElementById("input-screen");
+    if (report) report.style.display = "none";
+    if (input)  input.style.display  = "";
+    // Clear any parse errors
+    var err = document.querySelector(".parse-error");
+    if (err) err.textContent = "";
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('mnp-reset-btn');
+  if (btn) btn.addEventListener('click', function() {
+    var ta = document.getElementById('raw');
+    if (ta) ta.value = '';
+    var rs = document.getElementById('report-screen') || document.getElementById('s-report');
+    var is = document.getElementById('input-screen') || document.getElementById('s-input');
+    if (rs) rs.classList.remove('active');
+    if (is) is.classList.add('active');
+  });
+});
+</script>
 </body>
 </html>

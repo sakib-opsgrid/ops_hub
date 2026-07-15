@@ -336,7 +336,12 @@ function applyFilter() {
     return mq && mt;
   });
 
-  renderCards(data);
+  // Sort: CRITICAL first
+  const sorted = [...data].sort((a, b) => {
+    const order = { CRITICAL: 0, WARNING: 1 };
+    return (order[a.status] ?? 2) - (order[b.status] ?? 2);
+  });
+  renderCards(sorted);
 }
 
 /* ══════════════════════════════════════════
@@ -386,6 +391,11 @@ function generate() {
   document.getElementById('plain').textContent = buildPlainText(parsed, meta);
 
   /* Render cards */
+  // Sort: CRITICAL first, then WARNING, then OK
+  parsed.sort((a, b) => {
+    const order = { CRITICAL: 0, WARNING: 1 };
+    return (order[a.status] ?? 2) - (order[b.status] ?? 2);
+  });
   renderCards(parsed);
 
   /* Switch screen */

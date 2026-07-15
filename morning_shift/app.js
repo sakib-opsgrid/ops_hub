@@ -14,14 +14,14 @@ const DLR_CODES = [
 ];
 const LS_DRAFT   = 'msr_draft_v2';
 const LS_HISTORY = 'msr_history_v2';
-const LS_THEME   = 'msr_theme';
+const LS_DRAFT   = 'msr_draft';
 
 const togState = {};
 let autoSaveTimer = null;
 
 /* ── DOM Ready ──────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
+  // theme removed
   initDate();
   initToggles();
   buildHttp5xxSources();
@@ -33,20 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.addEventListener('input', scheduleAutoSave);
   document.body.addEventListener('change', scheduleAutoSave);
 });
-
-/* ── Theme ──────────────────────────────────────────────── */
-function initTheme() {
-  applyTheme(localStorage.getItem(LS_THEME) || 'light');
-}
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  localStorage.setItem(LS_THEME, theme);
-  const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = theme === 'dark' ? 'Light' : 'Dark';
-}
-function toggleTheme() {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
 
 /* ── Date ───────────────────────────────────────────────── */
 function initDate() {
@@ -512,6 +498,11 @@ function generateAndCopy() {
   const dateVal = document.getElementById('rep-date')?.value || '';
   const [y, m, d] = dateVal.split('-');
   const dateDisp = dateVal ? `${d}/${m}/${y}` : '—';
+
+  // Executed At = today's date
+  const today = new Date();
+  const execDisp = `${String(today.getDate()).padStart(2,'0')}/${String(today.getMonth()+1).padStart(2,'0')}/${today.getFullYear()}`;
+
   const author   = document.getElementById('rep-author')?.value.trim() || '';
 
   // ── 1xx ──
@@ -584,9 +575,9 @@ function generateAndCopy() {
   });
 
   // ── Compose ──
-  let msg = `*System Monitoring Overview Report*\nDate: ${dateDisp}\n`;
+  let msg = `*System Monitoring Overview Report*\nExecuted At: ${execDisp}\nReport Date: ${dateDisp}\n`;
   if (author) msg += `Prepared By: ${author}\n`;
-  msg += `${'─'.repeat(24)}\n`;
+  msg += `${'─'.repeat(16)}\n`;
   msg += `*1. HTTP Status (1xx / 5xx)*\n1xx MNO: ${txtMno}\n1xx IPTSP: ${txtIptsp}\n5xx: ${overall5xx}\n${http5xxLines}\n`;
   msg += `*2. Delay / DLR*\n${dlrLines}*Overall status:* ${dlrOverall}\n\n`;
   msg += `*3. Network (P2P / NTTN)*\n${netLines}*Overall status:* ${netOverall}\n\n`;
@@ -599,13 +590,14 @@ function generateAndCopy() {
   previewBox.textContent = msg;
   previewSection.style.display = 'block';
   previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  showWaModal(msg);
 
   navigator.clipboard.writeText(msg)
     .then(() => {
       showToast('Copied to clipboard!');
       const btn = document.getElementById('copy-btn');
       if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy WhatsApp Message'; }, 2500); }
-      saveToHistory(msg, dateFull);
+      saveToHistory(msg, dateDisp);
       saveDraft();
     })
     .catch(() => showToast('Clipboard error — copy manually from preview'));
@@ -1072,3 +1064,33 @@ function handleDrop(e, inputId, parseFn) {
   input.files = dt.files;
   parseFn(input);
 }
+
+/* ── WA Preview Modal ─────────────────────────────────── */
+function showWaModal(text) {
+  const overlay = document.getElementById('wa-modal-overlay');
+  const pre = document.getElementById('wa-modal-content');
+  if (!overlay || !pre) return;
+  pre.textContent = text;
+  overlay.style.display = 'flex';
+}
+function closeWaModal() {
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+function copyFromModal() {
+  const pre = document.getElementById('wa-modal-content');
+  const btn = document.getElementById('wa-modal-copy-btn');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    if (btn) { btn.textContent = 'Copied ✓'; btn.style.background = '#1A6B3C'; }
+    setTimeout(() => { if(btn){btn.textContent='Copy to Clipboard';btn.style.background='#1A1916';} }, 2000);
+  });
+}
+// Close on overlay click
+document.addEventListener('click', function(e) {
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (e.target === overlay) closeWaModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeWaModal();
+});

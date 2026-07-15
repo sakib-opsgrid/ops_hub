@@ -132,6 +132,10 @@ code {
   display: flex;
   overflow-x: auto;
   max-width: 100%;
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  box-shadow: var(--shadow-sm);
 }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-btn {
@@ -883,3 +887,6 @@ code {
   padding-top: 0.5rem;
   border-top: 1px solid #FDBA74;
 }
+
+/* OpsHub — header hidden when inside hub iframe */
+.hub-hidden { display: none !important; height: 0 !important; overflow: hidden !important; }

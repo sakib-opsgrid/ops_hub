@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>A2P Support Resolver</title>
+<style>
+  :root{
+    --bg: #f3f5f8;
+    --panel: #ffffff;
+    --panel-2: #f7f9fc;
+    --line: #dde3ec;
+    --text: #1b2433;
+    --muted: #64748b;
+    --accent: #0d7a6c;
+    --accent-dim: #a9d8d1;
+    --warn: #b45309;
+    --err: #c0362c;
+    --mono: "IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --sans: "IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html, body{height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1400px 700px at 15% -10%, #eef6f4 0%, transparent 60%),
+      radial-gradient(1000px 600px at 100% 0%, #eef2fb 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    min-height:100vh;
+    display:flex; flex-direction:column;
+  }
+  .wrap{max-width:100%; margin:0; padding:28px 40px 0; flex:1; display:flex; flex-direction:column;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:16px;
+    flex-wrap:wrap; gap:10px; width:100%;
+  }
+  .brand{display:flex; align-items:center; gap:8px;}
+  .brand .dot{
+    width:8px;height:8px;border-radius:2px;background:var(--accent);
+    box-shadow:0 0 6px rgba(13,122,108,.35);
+  }
+  .brand h1{
+    font-size:13px; letter-spacing:.03em; margin:0; font-weight:600;
+    font-family:var(--mono); text-transform:uppercase;
+  }
+  .verbadge{
+    font-family:var(--mono); font-size:9px; color:var(--accent);
+    border:1px solid var(--accent-dim); background:#f0f8f6;
+    padding:1px 6px; border-radius:20px; letter-spacing:.02em;
+    text-transform:none; vertical-align:middle; margin-left:5px;
+  }
+  .brand span{color:var(--muted); font-size:10.5px; font-family:var(--mono);}
+  .statusline{font-family:var(--mono); font-size:9.5px; color:var(--muted); text-align:right; line-height:1.5;}
+  .statusline b{color:var(--accent);}
+
+  .layout{display:grid; grid-template-columns: 1fr 1fr; gap:28px; flex:1;}
+  @media (max-width:920px){ .layout{grid-template-columns:1fr;} }
+
+  .card{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line); border-radius:10px; padding:28px;
+    display:flex; flex-direction:column; flex:1;
+    box-shadow:0 1px 3px rgba(20,30,50,.06);
+  }
+  .card h2{
+    font-family:var(--mono); font-size:12px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--muted); margin:0 0 14px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card h2::before{content:"▸"; color:var(--accent);}
+
+  textarea{
+    width:100%; min-height:260px; flex:1; resize:vertical;
+    background:#fbfcfd; border:1px solid var(--line); border-radius:8px;
+    color:var(--text); font-family:var(--sans); font-size:15px;
+    padding:16px; line-height:1.6;
+  }
+  textarea:focus, select:focus, input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+
+  .row{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; align-items:center;}
+  button{
+    font-family:var(--sans); font-weight:600; font-size:13.5px;
+    border-radius:7px; border:1px solid transparent; padding:10px 16px;
+    cursor:pointer; transition:transform .06s ease, filter .15s ease;
+  }
+  button:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent); color:#ffffff;}
+  .btn-primary:hover{filter:brightness(1.1);}
+  .btn-ghost{background:transparent; color:var(--text); border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent); background:#f0f8f6;}
+  .btn-ai{background:linear-gradient(135deg,#5b4fd6,#0d7a6c); color:#ffffff;}
+  .btn-ai:hover{filter:brightness(1.06);}
+  button:disabled{opacity:.5; cursor:not-allowed;}
+
+  .hint{font-size:12px; color:var(--muted); margin-top:8px;}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .chip{
+    font-family:var(--mono); font-size:11.5px; color:var(--muted);
+    border:1px dashed var(--line); border-radius:20px; padding:5px 11px;
+    cursor:pointer; background:transparent;
+  }
+  .chip:hover{color:var(--accent); border-color:var(--accent);}
+  .vchip.active-chip{
+    color:#fff; background:var(--accent); border-color:var(--accent); border-style:solid;
+    font-weight:600;
+  }
+
+  #results{display:flex; flex-direction:column; gap:14px; flex:1;}
+
+  .empty{color:var(--muted); font-size:13px; padding:30px 6px; text-align:center; font-family:var(--mono);}
+
+  .result{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:9px;
+    padding:14px 16px; position:relative;
+  }
+  .result.top{border-color:var(--accent-dim); box-shadow:0 0 0 1px rgba(53,208,186,.15) inset;}
+  .r-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;}
+  .r-title{font-size:14.5px; font-weight:600; color:var(--text); line-height:1.35;}
+  .r-meta{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;}
+  .badge{
+    font-family:var(--mono); font-size:10.5px; padding:2px 8px; border-radius:4px;
+    border:1px solid var(--line); color:var(--muted);
+  }
+  .badge.code{color:var(--accent); border-color:var(--accent-dim);}
+  .badge.score{color:var(--warn); border-color:#5a4322;}
+  .r-reason{font-size:12.5px; color:var(--muted); margin:8px 0; line-height:1.5;}
+  .r-reply{
+    background:#fbfcfd; border:1px solid var(--line); border-radius:7px;
+    padding:14px; font-size:14px; line-height:1.6; white-space:pre-wrap;
+    font-family:var(--sans); color:#2a3648;
+  }
+  .r-actions{display:flex; gap:8px; margin-top:10px;}
+  .r-actions button{padding:6px 12px; font-size:12px;}
+
+  .ai-box{
+    margin-top:16px; border:1px solid var(--accent-dim); border-radius:9px;
+    background:linear-gradient(180deg, rgba(53,208,186,.06), transparent);
+    padding:16px; display:none;
+  }
+  .ai-box.show{display:block;}
+  .ai-box h3{
+    margin:0 0 10px; font-family:var(--mono); font-size:11px; letter-spacing:.06em;
+    color:var(--accent); text-transform:uppercase;
+  }
+  .ai-out{font-size:13.5px; line-height:1.6; white-space:pre-wrap; color:var(--text);}
+  .spinner{
+    display:inline-block; width:13px; height:13px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--accent);
+    animation:spin .7s linear infinite; margin-right:8px; vertical-align:-2px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .footnote{
+    margin-top:auto; padding-top:50px; padding-bottom:22px;
+    font-size:11.5px; color:var(--muted); font-family:var(--mono); text-align:center;
+    border-top:1px solid var(--line);
+  }
+  .footnote a{color:var(--accent); text-decoration:none;}
+
+  .tabbar{display:flex; gap:8px; margin-bottom:20px;}
+  .tabbtn{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.03em;
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:9px 18px; border-radius:7px 7px 0 0; cursor:pointer; border-bottom:none;
+    position:relative; top:1px;
+  }
+  .tabbtn.active{color:var(--accent); border-color:var(--accent-dim); background:var(--panel);}
+  .view{display:none; flex:1;}
+  .view.active{display:flex; flex-direction:column; flex:1;}
+
+  .field-row{display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;}
+  .field{flex:1; min-width:180px;}
+  .field label{display:block; font-size:11px; color:var(--muted); font-family:var(--mono); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;}
+  select, input[type="text"], input[type="date"]{
+    width:100%; background:#fbfcfd; border:1px solid var(--line); border-radius:7px;
+    color:var(--text); font-family:var(--sans); font-size:13px; padding:9px 10px;
+    height:38px; box-sizing:border-box; line-height:1.2;
+  }
+
+  .timegroup{
+    border:1px solid var(--line); border-radius:9px; padding:14px 16px 4px;
+    margin-top:16px; background:var(--panel-2);
+  }
+  .timegroup-label{
+    font-family:var(--mono); font-size:11px; color:var(--accent); text-transform:uppercase;
+    letter-spacing:.06em; margin-bottom:2px; font-weight:600;
+  }
+
+  .email-out{display:grid; grid-template-columns:1fr; gap:14px; margin-top:16px;}
+  .email-field{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:14px 16px;}
+  .email-field .lbl{font-family:var(--mono); font-size:10.5px; color:var(--accent); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
+  .email-field .val{font-size:13.5px; line-height:1.6; white-space:pre-wrap; color:#2a3648;}
+  .mini-copy{font-family:var(--mono); font-size:10.5px; background:transparent; border:1px solid var(--line); color:var(--muted); padding:3px 9px; border-radius:5px; cursor:pointer;}
+  .mini-copy:hover{color:var(--accent); border-color:var(--accent);}
+
+  .subtabbar{display:flex; gap:8px; margin-bottom:16px;}
+  .subtabbtn{
+    font-family:var(--sans); font-size:13px; font-weight:600;
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:8px 16px; border-radius:20px; cursor:pointer;
+  }
+  .subtabbtn.active{color:#fff; background:var(--accent); border-color:var(--accent);}
+  .emode{display:none;}
+  .emode.active{display:block;}
+
+  .timeselect{display:flex; align-items:center; gap:4px;}
+  .timeselect select{width:auto; min-width:60px; padding:9px 6px; text-align:center; height:38px;}
+  .timeselect select#actStartAmpm, .timeselect select#actEndAmpm,
+  .timeselect select#downStartAmpm, .timeselect select#downEndAmpm{min-width:64px;}
+  .timeselect span{color:var(--muted); font-family:var(--mono);}
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:var(--accent); color:#ffffff; padding:9px 18px; border-radius:7px;
+    font-size:13px; font-weight:600; opacity:0; pointer-events:none;
+    box-shadow:0 4px 14px rgba(0,0,0,.15);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+</style>
+
+<!-- OpsHub integration -->
+<script>
+(function(){
+  if(window.self !== window.top){
+    document.documentElement.classList.add('in-hub');
+  }
+})();
+</script>
+<style>
+.in-hub .unified-header,
+.in-hub header { display:none!important; height:0!important; overflow:hidden!important; margin:0!important; padding:0!important; }
+.in-hub { --topbar:0px!important; }
+.hub-hidden { display:none!important; height:0!important; }
+</style>
+</head>
+<body>
+<header class="unified-header">
+  <div class="uh-icon" style="background:#F0F8F6;border-color:#A9D8D1;color:#0D7A6C;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid;flex-shrink:0">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </div>
+  <div class="uh-info" style="flex:1;min-width:0">
+    <div class="uh-title" style="font-size:0.88rem;font-weight:600;color:#1A1916;letter-spacing:-0.01em">Infozillion Teletech Bd Ltd <span style="font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;background:#F0F8F6;border:1px solid #A9D8D1;color:#0D7A6C;vertical-align:middle;margin-left:6px">v1.7</span></div>
+    <div class="uh-sub" style="font-size:0.7rem;color:#8b94aa;font-family:'DM Mono',monospace;margin-top:1px">Service Assurance · A2P Support Resolver · KB: <b id="kbCount">0</b> entries</div>
+  </div>
+  <div class="uh-actions" style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0">
+    <button onclick="resetAll()" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#F0EFE9;border:1px solid #E2E0D8;border-radius:8px;cursor:pointer;font-size:0.75rem;color:#6B6860;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap;transition:all 0.15s">&#8635; Reset</button>
+  </div>
+</header>
+<style>
+.unified-header{display:flex;align-items:center;gap:14px;background:#fff;padding:0 24px;height:56px;position:sticky;top:0;z-index:200;border-bottom:1px solid #E2E0D8;box-shadow:0 1px 3px rgba(0,0,0,0.06);flex-shrink:0}
+</style>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1>A2P Support Resolver <span class="verbadge">v1.7</span></h1>
+        <span>MNPSP · knowledge base built from API docs + internal FAQ</span>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="statusline">
+        KB entries loaded: <b id="kbCount">0</b><br>
+        Sources: IPTSP/PSTN · MNO · Aggregator API · FAQ v2.1
+      </div>
+      <button class="btn-ghost" style="padding:5px 12px; font-size:11.5px;" onclick="resetApp()" title="Reset everything">⟲ Reset</button>
+    </div>
+  </header>
+
+  <div class="tabbar">
+    <button class="tabbtn active" id="tabBtnResolver" onclick="switchTab('resolver')">▤ Quick Resolver</button>
+    <button class="tabbtn" id="tabBtnEmail" onclick="switchTab('email')">✉ Email Composer</button>
+  </div>
+
+  <div class="view active" id="resolverView">
+  <div class="layout">
+
+    <!-- LEFT: INPUT -->
+    <div class="card">
+      <h2>Client Query</h2>
+      <textarea id="query" placeholder=""></textarea>
+      <div class="row">
+        <button class="btn-primary" onclick="findSolution()">Find Solution</button>
+        <button class="btn-ai" onclick="generateAIReply()">✦ Generate AI Reply</button>
+        <button class="btn-ghost" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="hint">Instant match ekhoni result dekhabe. AI Reply generate korte Claude API call hobe (matched KB context soho) — ektu shomoy nite pare.</div>
+
+      <div class="chips" id="quickChips"></div>
+
+      <div class="ai-box" id="aiBox">
+        <h3>AI-generated reply</h3>
+        <div class="ai-out" id="aiOut"></div>
+        <div class="r-actions">
+          <button class="btn-ghost" onclick="copyText('aiOut')">Copy reply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div class="card">
+      <h2>Matched Knowledge Base Entries</h2>
+      <div id="results"><div class="empty">Matching error code or FAQ entry will appear here.</div></div>
+    </div>
+
+  </div>
+  </div><!-- /resolverView -->
+
+  <div class="view" id="emailView">
+    <div class="subtabbar">
+      <button class="subtabbtn active" id="subtabGeneral" onclick="switchEmailMode('general')">General Compose</button>
+      <button class="subtabbtn" id="subtabMaint" onclick="switchEmailMode('maintenance')">🛠 Maintenance Notice</button>
+    </div>
+
+    <div class="emode active" id="generalEmailPanel">
+    <div class="card">
+      <h2>Compose / Reply to Email</h2>
+      <textarea id="emailInput" placeholder=""></textarea></textarea>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Mail Type</label>
+          <select id="emailType">
+            <option value="reply">Reply to client / aggregator</option>
+            <option value="new">New outgoing mail</option>
+            <option value="escalation">Escalation to MNO/IPTSP</option>
+            <option value="followup">Follow-up / reminder</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tone</label>
+          <select id="emailTone">
+            <option value="standard">Standard / professional</option>
+            <option value="urgent">Urgent — needs quick action</option>
+            <option value="apologetic">Apologetic — our-side delay/issue</option>
+            <option value="firm">Firm — repeated unresolved issue</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Your Name (for signature)</label>
+          <input type="text" id="emailName" placeholder="e.g. Name" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn-ai" onclick="generateEmailDraft()">✦ Draft Email</button>
+        <button class="btn-ghost" onclick="clearEmail()">Clear</button>
+      </div>
+      <div class="hint">KB context (error codes/FAQ) automatically use hobe jodi query-te relevant kichu thake — jate mail-er content accurate hoy.</div>
+
+      <div class="email-out" id="emailOutWrap" style="display:none;">
+        <div class="email-field">
+          <div class="lbl">Subject <button class="mini-copy" onclick="copyPlain('emailSubject')">Copy</button></div>
+          <div class="val" id="emailSubject"></div>
+        </div>
+        <div class="email-field">
+          <div class="lbl">Body <button class="mini-copy" onclick="copyPlain('emailBody')">Copy</button></div>
+          <div class="val" id="emailBody"></div>
+        </div>
+      </div>
+      <div id="emailLoading" style="display:none; margin-top:14px; font-size:13px; color:var(--muted);"><span class="spinner"></span>Drafting email...</div>
+    </div>
+    </div><!-- /generalEmailPanel -->
+
+    <div class="emode" id="maintenancePanel">
+    <div class="card">
+      <h2>MNO Maintenance Notification — Generate 3 Notices at Once</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label>MNO</label>
+          <select id="maintMno">
+            <option value="Grameenphone">Grameenphone</option>
+            <option value="Robi">Robi</option>
+            <option value="Banglalink">Banglalink</option>
+            <option value="Teletalk">Teletalk</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="maintDate" />
+        </div>
+        <div class="field">
+          <label>Your Name (for signature)</label>
+          <input type="text" id="maintName" placeholder="e.g. Name" />
+        </div>
+      </div>
+
+      <div class="timegroup">
+        <div class="timegroup-label">Activity Window</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Start</label>
+            <div class="timeselect">
+              <select id="actStartHour"></select><span>:</span><select id="actStartMin"></select><select id="actStartAmpm"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>End</label>
+            <div class="timeselect">
+              <select id="actEndHour"></select><span>:</span><select id="actEndMin"></select><select id="actEndAmpm"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timegroup">
+        <div class="timegroup-label">Downtime</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Start</label>
+            <div class="timeselect">
+              <select id="downStartHour"></select><span>:</span><select id="downStartMin"></select><select id="downStartAmpm"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>End</label>
+            <div class="timeselect">
+              <select id="downEndHour"></select><span>:</span><select id="downEndMin"></select><select id="downEndAmpm"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn-primary" onclick="generateMaintenanceNotice()">Generate 3 Notices</button>
+        <button class="btn-ghost" onclick="clearMaintenance()">Clear</button>
+      </div>
+
+      <div id="maintOutWrap" style="display:none; margin-top:20px;">
+        <div class="email-field" style="margin-bottom:14px;">
+          <div class="lbl">Client — Subject <button class="mini-copy" onclick="copyPlain('maintClientSubject')">Copy</button></div>
+          <div class="val" id="maintClientSubject"></div>
+        </div>
+        <div class="email-field">
+          <div class="lbl">Client — Body <button class="mini-copy" onclick="copyPlain('maintClientBody')">Copy</button></div>
+          <div class="val" id="maintClientBody"></div>
+        </div>
+
+        <div class="email-field" style="margin-top:20px; margin-bottom:14px;">
+          <div class="lbl">Tirzok (Internal) — Subject <button class="mini-copy" onclick="copyPlain('maintTirzokSubject')">Copy</button></div>
+          <div class="val" id="maintTirzokSubject"></div>
+        </div>
+        <div class="email-field">
+          <div class="lbl">Tirzok (Internal) — Body <button class="mini-copy" onclick="copyPlain('maintTirzokBody')">Copy</button></div>
+          <div class="val" id="maintTirzokBody"></div>
+        </div>
+
+        <div class="email-field" style="margin-top:20px;">
+          <div class="lbl">WhatsApp — Aggregators <button class="mini-copy" onclick="copyPlain('maintWhatsapp')">Copy</button></div>
+          <div class="val" id="maintWhatsapp"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <h2>POC Reply — When MNO Asks for Our Point of Contact</h2>
+      <div class="field-row">
+        <div class="field">
+          <label>Your Name (for signature)</label>
+          <input type="text" id="pocName" placeholder="e.g. Name" />
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn-primary" onclick="generatePocReply()">Generate POC Reply</button>
+      </div>
+
+      <div class="email-out" id="pocOutWrap" style="display:none;">
+        <div class="email-field">
+          <div class="lbl">Subject <button class="mini-copy" onclick="copyPlain('pocSubject')">Copy</button></div>
+          <div class="val" id="pocSubject"></div>
+        </div>
+        <div class="email-field">
+          <div class="lbl">Body <button class="mini-copy" onclick="copyPlain('pocBody')">Copy</button></div>
+          <div class="val" id="pocBody"></div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /maintenancePanel -->
+  </div>
+
+  <div class="footnote">Built from Api-IPTSP.pdf · Api-Operator.pdf · Api-Aggregator.pdf · FAQs_New_2025.pdf — internal use only</div>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ============================================================
+   KNOWLEDGE BASE
+   Extracted from: IPTSP/PSTN API doc, MNO/ANS API doc,
+   Aggregator API doc, and MNPSP internal FAQ (v2.1)
+   ============================================================ */
+
+const CODE_MAP_ANS = {
+  "1000":"Success","1001":"IP Blacklist","1002":"Invalid Username","1003":"Invalid Password",
+  "1004":"Parameter missing","1005":"Invalid Parameter","1006":"CLI/Masking Invalid","1007":"Account Barred",
+  "1008":"Insufficient Balance","1009":"DND User","1010":"Invalid MSISDN","1011":"Duplicate Transaction ID",
+  "1012":"Message length exceed","1013":"No Request found","1014":"Delivery pending","1015":"TPS Limit Exceeded",
+  "1016":"Number Barred","1017":"API is not allowed for user","1018":"No Live Campaign","1019":"Messagebody Invalid",
+  "1020":"Internal Server Error","1021":"CLI/Masking Already Exists","1050":"Allowed campaigns limit exceeded",
+  "1051":"Allowed SMS quota is completed","1052":"Submission record not found","1053":"Invalid Transaction Id",
+  "1054":"MSISDN Limit Exceeded","1429":"Too Many Requests"
+};
+
+const CODE_MAP_A2P = {
+  "9000":"Request successful!","9001":"Required field missing!","9002":"Client credentials mismatch!",
+  "9003":"Out of balance!","9004":"Insufficient balance!","9005":"Client not found!","9006":"Invalid source IP!",
+  "9007":"Invalid bill MSISDN!","9008":"Invalid CLI!","9009":"Missing destination MSISDN!",
+  "9010":"Max limit for destination MSISDN exceeds!","9011":"MNO server failure!","9012":"Dipping failure!",
+  "9013":"Invalid Content!","9014":"Invalid keyword!","9015":"DND server failure!",
+  "9016":"Invalid check delivery request!","9017":"Invalid check balance request!","9018":"Invalid check CLI request!",
+  "9019":"Invalid transaction type!","9020":"Invalid message type!","9099":"Server failure!"
+};
+
+const KB = [
+  {
+    id:1, cat:"error", codes:[], title:"Account Temporarily Barred (Insufficient Balance)",
+    keywords:["account barred","temporarily barred","prepaid barred","top up","refill"],
+    reason:"Aggregator's prepaid account on the A2P SMS Hub is temporarily barred due to insufficient balance.",
+    reply:"Dear Concerned,\n\nYour prepaid account on the A2P SMS Hub is temporarily barred due to insufficient balance. Please refill it. For further details, please get in touch with your account manager."
+  },
+  {
+    id:2, cat:"error", codes:[], title:"IPTSP Did Not Call DLR Webhook",
+    keywords:["dlr not received","delivery status blank","deliverystatus null","no dlr","iptsp dlr"],
+    reason:"deliveryStatus returns empty/placeholder (e.g. '8801978161460-') because the IPTSP did not push DLR status back to A2P SMS Hub.",
+    reply:"Dear Concerned,\n\nFor this request, IPTSP did not push DLR status in A2P SMS Hub.\n\n— OR —\n\nAfter investigating we found that ADN did not push DLR status in A2P SMS Hub for this request. Please contact ADN with ansTxnId = <insert ansTxnId>."
+  },
+  {
+    id:3, cat:"error", codes:["9003","9004"], title:"9003/9004 — Out of Balance! / Insufficient Balance!",
+    keywords:["out of balance","insufficient balance","barred low balance","9003","9004"],
+    reason:"Aggregator account balance is less than 0/minimum required, or not enough to process all requested destination numbers.",
+    reply:"Dear Concerned,\n\nWe are observing that a lot of your API calls are failing due to insufficient balance. Please check.\n\nIssue duration: <date/time> - Till now\nError: 9003/9004 (Out of balance / Insufficient balance) - <hit count>+ hits"
+  },
+  {
+    id:4, cat:"error", codes:["9005"], title:"9005 — Client Not Found!",
+    keywords:["client not found","9005","api key mismatch","wrong api key"],
+    reason:"The apiKey used in the Send SMS API call does not match the aggregator's actual API key, often due to using the wrong environment's key.",
+    reply:"Dear Concerned,\n\nError code 9005 (Client Not Found) indicates that the API Key used to call the Send SMS API might not match your actual API Key. Kindly retrieve your actual API Key from your user portal (https://myportal.mnpspbd.com) and try again. Also check the POST URL for sending SMS API calls. Note that Production (live) and Staging (test) platform POST URL and API key are different."
+  },
+  {
+    id:5, cat:"error", codes:["9007"], title:"9007 — Invalid Bill-MSISDN!",
+    keywords:["invalid bill msisdn","9007","wrong url mno iptsp"],
+    reason:"Send SMS API call was made to IPTSP using the MNO URL (or vice versa), or the billMsisdn was not found in the registered list.",
+    reply:"Dear Concerned,\n\nThis URL is designated for ANS-type MNO. Please select the IPTSP URL for this request."
+  },
+  {
+    id:6, cat:"error", codes:["9008"], title:"9008 — Invalid CLI! (not registered / mismatched / spelling)",
+    keywords:["invalid cli","9008","cli not registered","cli spelling mistake","cli mismatch"],
+    reason:"Reason 1: CLI not registered under the given bill MSISDN.\nReason 2: For IPTSP, billMsisdn and CLI number must be the same — they differ.\nReason 3: CLI has a spelling mistake vs. the registered CLI.",
+    reply:"Dear Concerned,\n\nThis CLI \"<CLI>\" is not registered under the bill MSISDN \"<billMsisdn>\".\n\n[If billMsisdn/CLI mismatch for IPTSP:] Please check your requested CLI. Note that, Bill-MSISDN and CLI number should be the same for IPTSP.\n\n[If spelling mistake:] FYI, please verify the spelling of your requested CLI. We checked and found that a CLI, \"<correct CLI>\" is registered under the bill MSISDN \"<billMsisdn>\"."
+  },
+  {
+    id:7, cat:"error", codes:["9011"], title:"9011 — MNO Server Failure! (Banglalink — firewall filtering content)",
+    keywords:["mno server failure","9011","banglalink firewall","banglalink server failure"],
+    reason:"Unsupported form 'Content-Type: text/html' or a critical 5xx error from Banglalink. Often SMS content is being filtered by their firewall. Two phrasing options available — pick either.",
+    variants:[
+      {label:"Option 1", text:"Dear concerned,\n\nAfter reviewing your shared log, we identified a service degradation from Banglalink. A possible reason for this issue is that Banglalink might be rejecting your SMS content through their firewall. If possible, please share the actual SMS Content so we can pass it along to Banglalink for troubleshooting. You can also contact them directly."},
+      {label:"Option 2", text:"Dear concerned,\n\nUpon review of the provided log, we have identified a service degradation originating from Banglalink. A plausible explanation for this issue is that Banglalink may be filtering or rejecting your SMS content via their firewall. If feasible, kindly share the actual SMS content with us so that we may forward it to Banglalink for further troubleshooting. You may also contact them directly."}
+    ]
+  },
+  {
+    id:46, cat:"error", codes:["9011"], title:"9011 — MNO Server Failure! (Non-Banglalink, e.g. Robi)",
+    keywords:["mno server failure","9011","robi server failure","robi malformed","non banglalink"],
+    reason:"Check ELK logs first to confirm current status, then pick the matching reply — Ongoing (issue still under investigation) or Resolved (service verified working again).",
+    variants:[
+      {label:"Issue Ongoing", text:"Dear concerned,\n\nRegarding your request, we noticed that {MNO} responded with an unsupported or malformed format. We have already addressed the issue with {MNO} and are in ongoing communication. We will inform you as soon as we receive more updates."},
+      {label:"Issue Resolved", text:"Dear concerned,\n\nWe observed an A2P SMS service degradation for {MNO} at the specified timestamp. The service appears to be functioning properly now. Please inform us if you encounter any additional issues."}
+    ]
+  },
+  {
+    id:47, cat:"error", codes:[], title:"9000 — Check Balance Success but availableBalance = 0",
+    keywords:["availablebalance 0","check balance zero","balance 0","available balance 0","zero balance","check balance api"],
+    reason:"Check Balance API returned a successful response (9000 from A2P Hub, 1000 from ANS), but the availableBalance field shows 0 — needs verification directly with the ANS/operator end.",
+    reply:"Dear Concerned,\n\nYou have received a successful response for the Check Balance API call. In the response, the \"availableBalance\": \"0\" value was returned from ANS (operator end). We kindly request that you contact the ANS point of contact (POC) to verify the available balance and investigate the issue further.\n\nThank you."
+  },
+  {
+    id:8, cat:"error", codes:["9012"], title:"9012 — Dipping Failure!",
+    keywords:["dipping failure","9012","12 digit msisdn","invalid digit count"],
+    reason:"MSISDN provided has fewer/more digits than the required 13 (e.g. 12-digit number).",
+    reply:"Dear Concerned,\n\nDue to invalid MSISDN you have got 9012 (Dipping Failure). You were trying to send an SMS request with #12# digits (Sample: #880161781333#) at that time. It should be 13 digits."
+  },
+  {
+    id:9, cat:"error", codes:["9013"], title:"9013 — Invalid Content! / Invalid API Calls!",
+    keywords:["invalid content","9013","content mismatch","campaign content"],
+    reason:"Either a high volume of invalid API calls, or the sent SMS content does not match the content approved for that campaign ID.",
+    reply:"Dear Concerned,\n\nWe are observing a lot of Invalid API calls from your end. Please look into the issue and rectify it.\nIssue duration: <date> - Till now | Error: 9013 (Invalid content!) - <hits>+ hits\n\n— OR (content mismatch) —\n\nUpon investigation, we found that the SMS content you sent does not match the approved content for this campaign ID. Please refer to the attached screenshot for reference."
+  },
+  {
+    id:10, cat:"error", codes:["9016"], title:"9016 — Invalid Check Delivery! (missing billMsisdn)",
+    keywords:["invalid check delivery","9016","billmsisdn missing"],
+    reason:"The billMsisdn field is missing in the Check Delivery API call — it's mandatory. Also, the Send SMS serverTxnId must be used as reference.",
+    reply:"Dear Concerned,\n\nAfter investigation, we found that the Bill MSISDN field is missing in your Check Delivery API call. This field is mandatory. Also, please use the Send SMS Server Transaction ID that you want to check the DLR for."
+  },
+  {
+    id:11, cat:"error", codes:["9016"], title:"9016 — Invalid Check Delivery! (checked too soon)",
+    keywords:["invalid check delivery too early","9016 timing","check delivery within 10 minutes"],
+    reason:"Check Delivery was called less than 10 minutes after sending the SMS. Recommended to wait at least 10 minutes for an accurate delivery status.",
+    reply:"Dear Concerned,\n\nAfter our investigation, we observed that your SMS was sent at <time>, while the Check Delivery API was called at <time>. To obtain the most accurate delivery status for both promotional and transactional SMS, we recommend invoking the Check Delivery API at least 10 minutes after submitting the SMS. Calling it earlier may return \"Invalid Check Delivery Request\", as experienced in this case."
+  },
+  {
+    id:12, cat:"error", codes:["1001"], title:"1001 — IP Blacklist!",
+    keywords:["ip blacklist","1001"],
+    reason:"Response code 1001 received from the ANS operator (MNO/IPTSP) — the source IP is blacklisted at their end.",
+    reply:"Dear Concerned,\n\nThank you for contacting us. You are receiving response code 1001 (IP Blacklist) from your ANS operator. Please inform them that you intend to send SMS via the A2P SMS Hub (Infozillion) and provide them the following information:\n\nBillMSISDN/VMSISDN= <value>\nClientTxnId= <value>"
+  },
+  {
+    id:13, cat:"error", codes:["1002"], title:"1002 — Invalid Username!",
+    keywords:["invalid username","1002"],
+    reason:"Username provided in the API call does not match what ANS (MNO or IPTSP) expects.",
+    reply:"Dear Concerned,\n\nThe code 1002 (\"Invalid Username\") indicates that the username provided in the API call does not match the username expected by ANS (MNO or IPTSP). If the username has been verified as correct, kindly contact ANS for further investigation and correction."
+  },
+  {
+    id:14, cat:"error", codes:["1003"], title:"1003 — Invalid Password!",
+    keywords:["invalid password","1003"],
+    reason:"System is using an invalid password at the ANS/MNO end (success on A2P side, 1003 from ANS).",
+    reply:"Dear Concerned,\n\nThis error (1003) indicates that your system is using an invalid password. Username and Password are provided by your ANS. You got success from our end and error 1003 from ANS. Please contact them to fix your issue. (Note: For IPTSP = ANS, for MNO = MNO.)"
+  },
+  {
+    id:15, cat:"error", codes:["1005"], title:"1005 — Invalid Parameter! (general, from MNO)",
+    keywords:["invalid parameter","1005 mno"],
+    reason:"1005 Invalid parameter error originating from MNO side.",
+    reply:"Dear Concerned,\n\nThis 1005 Invalid parameter error originated from MNO. Please contact the POC of MNO with Clienttransid: <value>."
+  },
+  {
+    id:16, cat:"error", codes:["1005"], title:"1005 — Invalid Parameter! [Send SMS, Robi]",
+    keywords:["1005 robi send sms"],
+    reason:"1005 error on Send SMS specifically tied to Robi.",
+    reply:"Dear Concerned,\n\nWe have communicated with Robi regarding this issue. We will update you as soon as we get feedback from Robi."
+  },
+  {
+    id:17, cat:"error", codes:["1005"], title:"1005 — Promotional Message Not Allowed At This Moment (Robi)",
+    keywords:["promotional not allowed","robi restricted hours","8pm 9am promo"],
+    reason:"Robi does not allow promotional SMS between 8:00 PM and 9:00 AM.",
+    reply:"Dear Concerned,\n\nRobi informed us that they do not allow promotional SMS transmission from 8:00 PM to 9:00 AM. Hence you received the error from their platform (Code: 1005, Description: \"Promotional message not allowed at this moment\"). For further query, you can communicate with Robi directly."
+  },
+  {
+    id:18, cat:"error", codes:["1005"], title:"1005 — Invalid Parameter! [Check Delivery]",
+    keywords:["1005 check delivery"],
+    reason:"1005 received from ANS specifically on a Check Delivery API call.",
+    reply:"Dear Concerned,\n\nWe have received error 1005 from ANS for the Check Delivery API call. Kindly communicate with ANS with details like Bill-MSISDN, Recipient MSISDN, CLI/Masking, Send Date Time, MnoTxnID, and the Check Delivery API call result."
+  },
+  {
+    id:19, cat:"error", codes:["1006"], title:"1006 — CLI/Masking Invalid!",
+    keywords:["cli masking invalid","1006"],
+    reason:"CLI already added successfully in A2P SMS Hub (9000) but ANS/MNO (e.g. ROBI) rejects it with 1006 on their end.",
+    reply:"Dear Concerned,\n\nWe have reviewed the issue and found that the requested CLI has already been added to the A2P SMS Hub, where a 9000 success response was received. However, a 1006 error was received from ANS, indicating the request failed at the MNO end. Please coordinate with them and share transaction ID: <value> for further investigation.\n\n— For a specific/isolated case —\nFor this specific issue, the aggregator needs to contact MNO directly regarding the 1006 error."
+  },
+  {
+    id:20, cat:"error", codes:["1007"], title:"1007 — Account Barred!",
+    keywords:["account barred 1007"],
+    reason:"Account restricted on the ANS end.",
+    reply:"Dear concerned,\n\nError code 1007 \"Account barred\" indicates that your account has been restricted on the ANS end. Kindly contact ANS for further assistance."
+  },
+  {
+    id:21, cat:"error", codes:["1008"], title:"1008 — Insufficient Balance! (from MNO)",
+    keywords:["insufficient balance 1008 mno"],
+    reason:"Insufficient balance reported from the MNO side (distinct from 9004 which is A2P-level).",
+    reply:"Dear Concerned,\n\nYou get 1008 (Insufficient Balance) for this request. This error indicates Insufficient Balance from MNO. Please contact the POC of MNO."
+  },
+  {
+    id:22, cat:"error", codes:["1010"], title:"1010 — Invalid MSISDN!",
+    keywords:["invalid msisdn 1010"],
+    reason:"A2P SMS Hub returns success (9000) and MSISDN is valid, but ANS still returns 1010 Invalid MSISDN.",
+    reply:"Dear Concerned,\n\nYou received a success response (9000) from the A2P SMS Hub, and the MSISDN used is valid. However, ANS returned: \"ansResponseCode\": \"1010\", \"ansResponseMessage\": \"Invalid MSISDN\". Please communicate with the POC of ANS to resolve the issue."
+  },
+  {
+    id:23, cat:"error", codes:["1012"], title:"1012 — Message Length Exceed! (isLongSMS = true)",
+    keywords:["message length exceed longsms true","1012 true"],
+    reason:"isLongSMS was correctly set to true but 1012 still occurred — MNO-specific max content length limit.",
+    reply:"Dear Concerned,\n\nAfter investigation, we found that you correctly used \"isLongSMS: true\", however you still received \"Message length exceed\" (Code 1012). Please communicate with ANS using ansTxnId=<value>. Note that operators specify max content length, which may vary — discuss the allowed max length with your operator."
+  },
+  {
+    id:24, cat:"error", codes:["1012"], title:"1012 — Message Length Exceed! (isLongSMS = false)",
+    keywords:["message length exceed longsms false","1012 false"],
+    reason:"isLongSMS was set to false — recommend setting it to true; if error persists, escalate to ANS.",
+    reply:"Dear Concerned,\n\nAfter investigation, we found that you used \"isLongSMS: false\". Please use \"isLongSMS: true\". If you still receive \"Message length exceed\" (Code 1012), please communicate with ANS using ansTxnId=<value>. Operators specify max content length, which may vary — discuss with your operator."
+  },
+  {
+    id:25, cat:"error", codes:["1013"], title:"1013 — No Request Found! (MNO DLR Response)",
+    keywords:["no request found 1013"],
+    reason:"ANS returns 1013 (No request found) on a DLR/status check.",
+    reply:"Dear Concerned,\n\nYou have received 1013 (No request found) response from ANS. In this case, please contact the POC of ANS."
+  },
+  {
+    id:26, cat:"error", codes:["1014"], title:"1014 — Delivery Pending!",
+    keywords:["delivery pending 1014 robi"],
+    reason:"Robi end returns delivery pending status.",
+    reply:"Dear Concerned,\n\nYou are getting the \"1014 : Delivery pending\" response from the Robi end. We have already communicated with Robi regarding this issue. You may also communicate with the POC of Robi from your end."
+  },
+  {
+    id:27, cat:"error", codes:["1015"], title:"1015 — TPS Limit Exceeded! (MNO / IPTSP)",
+    keywords:["tps limit exceeded 1015"],
+    reason:"A TPS (transactions-per-second) limit is set at the MNO or ANS end for this aggregator.",
+    reply:"[MNO] Dear Concerned,\n\nThe error 1015 - \"TPS Limit Exceeded\" originates from MNO. There's a TPS limit set for you at the MNO end. Please contact the POC of MNO with mnoTxnId = <value>.\n\n[IPTSP] The error 1015 originates from ANS. There's a TPS limit set for you at the ANS end. Please contact the POC of ANS with mnoTxnId = <value>."
+  },
+  {
+    id:28, cat:"error", codes:["1016"], title:"1016 — Number Barred!",
+    keywords:["number barred 1016"],
+    reason:"9000 success from A2P SMS Hub, but 1016 (Number Barred) from ANS/operator — destination number is barred at operator end.",
+    reply:"Dear concerned,\n\nYou have received a 9000 response from the A2P SMS Hub and 1016 (Number barred) from ANS/operator end. That means your requested destination number is barred at the ANS/Operator end. Please contact the POC of the MNO with mnoTxnId = <value>."
+  },
+  {
+    id:29, cat:"error", codes:["1017"], title:"1017 — API Is Not Allowed For Users!",
+    keywords:["api not allowed for user 1017"],
+    reason:"Account not permitted to use API at the ANS end (despite 9000 success from A2P Hub).",
+    reply:"Dear Concerned,\n\nYou got a success response 9000 from A2P SMS Hub, but ANS gave this error: \"ansResponseCode\": \"1017\", \"ansResponseMessage\": \"API is not allowed for user\" — meaning your account is not allowed to use API at the ANS end. Please communicate with the POC of ANS."
+  },
+  {
+    id:30, cat:"error", codes:["1018"], title:"1018 — No Live Campaign!",
+    keywords:["no live campaign 1018"],
+    reason:"Similar to 1050 — usually a fixed-quota or internal ANS mechanism issue, problem on the ANS end.",
+    reply:"Dear Concerned,\n\nSimilar to a 1050 error, this happens due to a fixed quota or malfunction — usually produced by the ANS's internal mechanism. This is a problem on the ANS end."
+  },
+  {
+    id:31, cat:"error", codes:["1020"], title:"1020 — Internal Server Error!",
+    keywords:["internal server error 1020"],
+    reason:"Internal server error at the ANS end.",
+    reply:"Dear Concerned,\n\nWe have already communicated with ANS about the issue. After getting an update we will notify you."
+  },
+  {
+    id:32, cat:"error", codes:["415"], title:"HTTP 415 — Unsupported Media Type!",
+    keywords:["415 unsupported media type","content-type header"],
+    reason:"Server rejecting the request due to an unsupported request payload format — Content-Type header missing/incorrect.",
+    reply:"Dear Concerned,\n\nThe HTTP 415 error (\"Unsupported Media Type\") indicates that the server is rejecting the request due to an unsupported format of the request payload. Please verify the Content-Type header in your calling function — it must be set to Content-Type: application/json."
+  },
+  {
+    id:33, cat:"error", codes:["1429"], title:"1429 — Too Many Requests! (Robi)",
+    keywords:["too many requests 1429 robi"],
+    reason:"Robi mnoResponseCode 1429 — 'Too Many Requests. Try in a minute.' — typically seen on Check Delivery calls.",
+    reply:"Dear Concerned,\n\nWe are observing errors in response to some API calls to Robi: mnoResponseCode '1429', mnoResponseMessage 'Too Many Requests. Try in a minute.' Please look into the request rate/timing for this call."
+  },
+  {
+    id:34, cat:"error", codes:["400"], title:"HTTP 400 — Bad Request",
+    keywords:["http 400","bad request","invalid json","gateway rejected"],
+    reason:"Malformed JSON, or issue with URL/headers/HTTP method/cookies/SSL, or rejected at the gateway layer before reaching the SMS application.",
+    reply:"Dear Concerned,\n\nThe request was rejected at the gateway layer before reaching the SMS application — typically due to invalid request format, headers, or payload structure. Please verify:\n- Content-Type: application/json\n- Valid JSON format (no syntax errors)\n- All required fields present\n- Correct HTTP method: POST\n- Authorization header\n- No disallowed characters in message content"
+  },
+  {
+    id:35, cat:"error", codes:[], title:"Connectivity Issue (Aggregator can't reach server)",
+    keywords:["connectivity issue","cannot connect","can't reach server","telnet 443"],
+    reason:"Aggregator reports being unable to connect. Needs failed request body + timestamp to verify; if nothing found in logs, verify network path via telnet.",
+    reply:"Dear Concerned,\n\nPlease share the request body of the failed message along with the exact timestamp for our verification.\n\n— If no issue found in logs —\nWe did not find any related entries in our logs. Kindly perform a telnet test to api.mnpspbd.com on port 443 and share a screenshot of the result for further investigation."
+  },
+  {
+    id:36, cat:"error", codes:["403"], title:"HTTP 403 — Forbidden",
+    keywords:["http 403","forbidden","ip not whitelisted"],
+    reason:"Aggregator getting 403 — usually source IP not whitelisted; needs IP confirmation and telnet test.",
+    reply:"Dear Concerned,\n\nCould you confirm the IP you are trying to call from? Please run: curl -4 https://checkip.amazonaws.com; curl -4 https://api.ipify.org; curl -4 https://icanhazip.com — and share a screenshot. Afterward, please telnet to api.mnpspbd.com on port 443 and share that screenshot as well."
+  },
+  {
+    id:37, cat:"error", codes:["499"], title:"HTTP 499 — Client Closed Request",
+    keywords:["http 499","client closed request","nginx 499"],
+    reason:"Non-standard NGINX code — the client closed the connection before the server finished processing/responding. Logged internally, not sent to the client's browser.",
+    reply:"Kindly send a few more requests and share the corresponding results with us so we can investigate the timing on our end."
+  },
+  {
+    id:38, cat:"other", codes:[], title:"TPS Limit — General Query",
+    keywords:["tps limit query","sending limit per min","dlr tps"],
+    reason:"Aggregator asking about TPS limits for Send SMS or DLR requests.",
+    reply:"Dear concerned,\n\nThere is no TPS limit at our end for Send SMS. For DLR, there is a 20 TPS limit set at our end. Your Send SMS TPS will depend on your MNO/IPTSP's limit — kindly get in touch with them for details."
+  },
+  {
+    id:39, cat:"other", codes:[], title:"Request Not Found In IPTSP Portal (messageID null)",
+    keywords:["not found in iptsp portal","messageid null"],
+    reason:"A2P Hub shows 9000/1000 success but client can't find the request in the IPTSP portal, often due to a null message ID reference.",
+    reply:"Dear Concerned,\n\nWe checked and found that in your shared server txn ID, we successfully sent this request to ANS (IPTSP) and received a 1000 response from ANS. For your further checking, here is the client txn ID for this request: Clienttransid = \"<value>\"."
+  },
+  {
+    id:40, cat:"other", codes:[], title:"MNP Number Got Non-Masking SMS",
+    keywords:["non masking sms mnp","ported number wrong sender"],
+    reason:"RN code was correctly provided; masking/non-masking delivery behavior depends on the ANS's own policy.",
+    reply:"Dear Concerned,\n\nWe checked and found that proper RN Code was provided with this SMS request. Delivering SMS in Masking/Non-Masking depends on the policy of ANS. Please contact your ANS to get details."
+  },
+  {
+    id:41, cat:"other", codes:[], title:"Masking / Non-Masking Issue (MNP Dipping)",
+    keywords:["masking non masking issue","mnp dipping long code"],
+    reason:"MNPSP provides port correction (RN dipping) only — not routing. The destination SMS gateway is chosen by the aggregator, so masking/non-masking behavior is on their end.",
+    reply:"Dear Concerned,\n\nAs discussed, MNPSP does not provide a routing service — it provides port correction (current port/RN of the MSISDN). The destination SMS gateway is selected from the aggregator end. In your case, dipping was fulfilled correctly from the MNPSP end, and a corrected port was delivered."
+  },
+  {
+    id:42, cat:"other", codes:[], title:"Does Not Receive Masking SMS (Ported Number)",
+    keywords:["ported number masking not received"],
+    reason:"Customer ported from one operator to another may receive SMS from a non-masked/CLI number even with masking configured — check MSISDN, RN code, CLI, ANS/MNO gateway first.",
+    reply:"Dear Concerned,\n\nIn most cases, when a customer ports their number from one operator to another, they may receive SMS from a non-masked/CLI number, although masking/CLI is configured. We checked and found proper RN code was provided with this SMS request. Delivery in masking/non-masking mode depends on ANS policy — please contact your ANS for details."
+  },
+  {
+    id:43, cat:"other", codes:[], title:"Handset Delivery Issue (Message Not Received)",
+    keywords:["handset delivery issue","message not received on handset"],
+    reason:"9000 (A2P Hub) and 1000 (ANS) success, but message not actually received on the handset — occasional, needs ANS-side check.",
+    reply:"Dear Concerned,\n\nPlease call the Check Delivery API to get the handset delivery status from ANS. Kindly communicate with ANS with details like Bill-MSISDN, Recipient MSISDN, CLI/Masking, and Send Date Time for further investigation."
+  },
+  {
+    id:44, cat:"other", codes:[], title:"IP Whitelisting / Deactivating Procedure",
+    keywords:["ip whitelist","ip deactivate","new ip request","helpdesk ticket ip"],
+    reason:"Standard operating procedure for whitelisting or removing an aggregator's IP address.",
+    reply:"Dear Concerned,\n\nPlease create a ticket on the Helpdesk (https://helpdesk.mnpspbd.com/) with the list of IP addresses to Active/Inactive. Note: only one IP address is permitted per aggregator, and the IP location must be within Bangladesh. Tickets created before 11:30 AM are processed by 11:30 AM the same day; tickets after 11:30 AM are processed by 4:00 PM."
+  },
+  {
+    id:45, cat:"other", codes:[], title:"Balance Notification Email — Excessive Decimals / Missing Balance",
+    keywords:["balance notification email issue","decimal digits balance","balance missing email"],
+    reason:"Aggregator notification email shows an excessive number of decimal digits in the balance figure, or the balance field is missing entirely — needs investigation with the notification/payment module.",
+    reply:"Dear Concerned,\n\nThank you for flagging this. We are looking into the balance notification email formatting/missing-value issue on our end and will update you shortly."
+  }
+];
+
+// merge code descriptions into searchable text
+function kbSearchText(k){
+  return [k.title, k.reason, (k.keywords||[]).join(" "), (k.codes||[]).join(" ")].join(" ").toLowerCase();
+}
+
+document.getElementById("kbCount").textContent = KB.length;
+const activeVariantIndex = {};
+let lastQueryText = "";
+
+const MNO_NAME_MAP = [
+  {pattern:/\brobi\b|\bairtel\b|\brb\b/i, name:"ROBI"},
+  {pattern:/\bteletalk\b|\btt\b/i, name:"TELETALK"},
+  {pattern:/\bgrameenphone\b|\bgp\b/i, name:"GRAMEENPHONE"},
+  {pattern:/\bbanglalink\b|\bbl\b/i, name:"BANGLALINK"}
+];
+
+function detectMnoListRaw(query){
+  const found = [];
+  MNO_NAME_MAP.forEach(m=>{
+    const re = new RegExp(m.pattern.source, "i");
+    const match = re.exec(query);
+    if(match) found.push({name:m.name, index:match.index});
+  });
+  found.sort((a,b)=>a.index-b.index);
+  return [...new Set(found.map(f=>f.name))];
+}
+
+function detectMnoList(query){
+  const raw = detectMnoListRaw(query);
+  return raw.length ? raw : ["ROBI"]; // sensible default when no operator name is mentioned, used only for text substitution
+}
+
+function joinNames(names){
+  if(names.length===1) return names[0];
+  if(names.length===2) return `${names[0]} and ${names[1]}`;
+  return names.slice(0,-1).join(", ") + ", and " + names[names.length-1];
+}
+
+function detectMno(query){
+  return detectMnoList(query)[0];
+}
+
+function applyMnoName(text, query){
+  if(!text.includes("{MNO}")) return text;
+  const combined = joinNames(detectMnoList(query));
+  return text.split("{MNO}").join(combined);
+}
+
+// quick chips for common codes
+const commonCodes = ["9008","9011","9012","9013","1002","1005","1015","IP Blacklist","Delivery Pending","Message Length Exceed"];
+const chipsWrap = document.getElementById("quickChips");
+commonCodes.forEach(c=>{
+  const b = document.createElement("button");
+  b.className="chip"; b.textContent=c;
+  b.onclick=()=>{ document.getElementById("query").value = c; findSolution(); };
+  chipsWrap.appendChild(b);
+});
+
+function tokenize(s){
+  return (s||"").toLowerCase().match(/[a-z0-9\.]+/g) || [];
+}
+
+function scoreEntry(entry, queryLower, tokens){
+  let score = 0;
+  const hay = kbSearchText(entry);
+  // exact code match = strong signal
+  (entry.codes||[]).forEach(code=>{
+    if(queryLower.includes(code.toLowerCase())) score += 8;
+  });
+  // keyword phrase match
+  (entry.keywords||[]).forEach(kw=>{
+    if(queryLower.includes(kw.toLowerCase())) score += 5;
+  });
+  // token overlap against title+reason
+  tokens.forEach(t=>{
+    if(t.length<3) return;
+    if(hay.includes(t)) score += 1;
+  });
+  return score;
+}
+
+function findSolution(){
+  const q = document.getElementById("query").value.trim();
+  const resultsEl = document.getElementById("results");
+  if(!q){
+    resultsEl.innerHTML = '<div class="empty">Query khali ache — kichu likho age.</div>';
+    return;
+  }
+  lastQueryText = q;
+  const queryLower = q.toLowerCase();
+  const tokens = tokenize(q);
+
+  let scoredAll = KB.map(entry=>({entry, score: scoreEntry(entry, queryLower, tokens)}))
+                     .filter(x=>x.score>0)
+                     .sort((a,b)=>b.score-a.score);
+
+  // if the query explicitly mentions a known error code, lock results to ONLY that code —
+  // don't mix in unrelated matches even if they scored on keyword overlap.
+  const allKnownCodes = new Set([...Object.keys(CODE_MAP_ANS), ...Object.keys(CODE_MAP_A2P)]);
+  const mentionedCodes = (q.match(/\b\d{3,4}\b/g) || []).filter(c => allKnownCodes.has(c));
+  if(mentionedCodes.length > 0){
+    const codeLocked = scoredAll.filter(x => (x.entry.codes||[]).some(c => mentionedCodes.includes(c)));
+    if(codeLocked.length > 0) scoredAll = codeLocked;
+  }
+
+  // for the 9011 Banglalink (id 7) vs Non-Banglalink (id 46) split: if the query clearly
+  // names one side only, drop the irrelevant one so we don't show both.
+  const rawMno = detectMnoListRaw(q);
+  const hasBanglalink = rawMno.includes("BANGLALINK");
+  const hasOtherMno = rawMno.some(n => n !== "BANGLALINK");
+  if(hasBanglalink && !hasOtherMno){
+    scoredAll = scoredAll.filter(x => x.entry.id !== 46);
+  } else if(hasOtherMno && !hasBanglalink){
+    scoredAll = scoredAll.filter(x => x.entry.id !== 7);
+  }
+
+  const scored = scoredAll.slice(0,6);
+
+  if(scored.length===0){
+    resultsEl.innerHTML = '<div class="empty">Kono direct match paini KB-te. Niche "Generate AI Reply" try koro — AI full FAQ context diye reply generate korbe.</div>';
+    return;
+  }
+
+  resultsEl.innerHTML = "";
+  scored.forEach((s, idx)=>{
+    const e = s.entry;
+    const div = document.createElement("div");
+    div.className = "result" + (idx===0 ? " top":"");
+    const codesHtml = (e.codes||[]).map(c=>`<span class="badge code">${c}</span>`).join("");
+
+    let variantChips = "";
+    let initialText = e.reply;
+    if(e.variants && e.variants.length){
+      if(activeVariantIndex[e.id]===undefined) activeVariantIndex[e.id]=0;
+      initialText = e.variants[activeVariantIndex[e.id]].text;
+      variantChips = `<div class="chips" style="margin-top:0;">` +
+        e.variants.map((v,i)=>`<button class="chip vchip${i===activeVariantIndex[e.id]?" active-chip":""}" id="vchip-${e.id}-${i}" onclick="selectVariant(${e.id},${i})">${v.label}</button>`).join("") +
+        `</div>`;
+    }
+    initialText = applyMnoName(initialText, q);
+
+    div.innerHTML = `
+      <div class="r-head">
+        <div class="r-title">${e.title}</div>
+      </div>
+      <div class="r-meta">
+        ${codesHtml}
+        <span class="badge">${e.cat==="error"?"Error Code":"Ops/Other"}</span>
+        <span class="badge score">match score ${s.score}</span>
+      </div>
+      <div class="r-reason"><b>Reason:</b> ${e.reason}</div>
+      ${variantChips}
+      <div class="r-reply" id="reply-${e.id}" style="margin-top:${variantChips?"10px":"0"};">${initialText}</div>
+      <div class="r-actions">
+        <button class="btn-ghost" onclick="copyText('reply-${e.id}')">Copy exact reply</button>
+        <button class="btn-ai" style="padding:6px 12px; font-size:12px;" onclick="rewriteWithAI(${e.id})">✦ Rewrite with AI</button>
+      </div>
+      <div class="ai-box" id="rewriteBox-${e.id}"></div>
+    `;
+    resultsEl.appendChild(div);
+  });
+}
+
+function selectVariant(entryId, idx){
+  const entry = KB.find(k=>k.id===entryId);
+  if(!entry || !entry.variants) return;
+  activeVariantIndex[entryId] = idx;
+  document.getElementById(`reply-${entryId}`).textContent = applyMnoName(entry.variants[idx].text, lastQueryText);
+  entry.variants.forEach((v,i)=>{
+    const chip = document.getElementById(`vchip-${entryId}-${i}`);
+    if(chip) chip.classList.toggle("active-chip", i===idx);
+  });
+}
+
+function copyToClipboard(text, successMsg){
+  // try modern Clipboard API first
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      ()=>showToast(successMsg),
+      ()=>fallbackCopy(text, successMsg)
+    );
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+}
+
+function fallbackCopy(text, successMsg){
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    ta.style.top = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    if(ok) showToast(successMsg);
+    else showToast("Copy failed — please select and copy manually");
+  }catch(err){
+    showToast("Copy failed — please select and copy manually");
+  }
+}
+
+function copyText(elId){
+  const el = document.getElementById(elId);
+  const text = el.innerText || el.textContent;
+  copyToClipboard(text, "Copied to clipboard");
+}
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 1600);
+}
+
+function clearAll(){
+  document.getElementById("query").value = "";
+  document.getElementById("results").innerHTML = '<div class="empty">Matching error code or FAQ entry will appear here.</div>';
+  document.getElementById("aiBox").classList.remove("show");
+}
+
+async function rewriteWithAI(entryId){
+  const entry = KB.find(k=>k.id===entryId);
+  if(!entry) return;
+  const box = document.getElementById(`rewriteBox-${entryId}`);
+  box.classList.add("show");
+  box.innerHTML = '<h3>AI-rewritten reply</h3><div class="ai-out"><span class="spinner"></span>Rewriting...</div>';
+
+  const originalQuery = document.getElementById("query").value.trim();
+  const currentText = applyMnoName(entry.variants ? entry.variants[activeVariantIndex[entryId]||0].text : entry.reply, originalQuery);
+
+  const systemPrompt = `You are a support-reply assistant for Infozillion Teletech BD's A2P SMS Hub (MNPSP) team.
+You are given the EXACT, approved reply template from the internal FAQ for a matched issue, plus the client's actual query.
+Rewrite/personalize this reply to fit the specific query — fill in placeholders like <value> with details from the query where available,
+adjust wording naturally, but do NOT change the underlying facts, cause, or instructions in the original template.
+Keep the same professional tone and the "Dear Concerned," opening. Output only the final reply text, no meta-commentary.`;
+
+  const userMsg = `Client query:\n"""${originalQuery}"""\n\nExact approved FAQ reply template for "${entry.title}":\n"""${currentText}"""\n\nReason/context: ${entry.reason}\n\nRewrite this reply now.`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 800,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMsg }]
+      })
+    });
+    const data = await response.json();
+    const text = (data.content || []).map(b=>b.text||"").join("\n").trim();
+    box.innerHTML = `<h3>AI-rewritten reply</h3><div class="ai-out" id="rewriteOut-${entryId}">${text || "No response."}</div>
+      <div class="r-actions"><button class="btn-ghost" onclick="copyText('rewriteOut-${entryId}')">Copy rewritten reply</button></div>`;
+  }catch(err){
+    box.innerHTML = `<h3>AI-rewritten reply</h3><div class="ai-out">Error: ${err.message}. Note: AI features only work when this tool is opened as a live artifact preview inside the chat — not when downloaded and opened as a local file.</div>`;
+  }
+}
+
+async function generateAIReply(){
+  const q = document.getElementById("query").value.trim();
+  if(!q){ showToast("Age query likho"); return; }
+
+  const aiBox = document.getElementById("aiBox");
+  const aiOut = document.getElementById("aiOut");
+  aiBox.classList.add("show");
+  aiOut.innerHTML = '<span class="spinner"></span>Generating reply...';
+
+  // gather top matches as context for grounding
+  const queryLower = q.toLowerCase();
+  const tokens = tokenize(q);
+  const topMatches = KB.map(entry=>({entry, score: scoreEntry(entry, queryLower, tokens)}))
+                        .filter(x=>x.score>0)
+                        .sort((a,b)=>b.score-a.score)
+                        .slice(0,5)
+                        .map(x=>x.entry);
+
+  const contextBlock = topMatches.map(e=>
+    `Title: ${e.title}\nCodes: ${(e.codes||[]).join(", ")||"N/A"}\nReason: ${e.reason}\nStandard reply template: ${e.reply}`
+  ).join("\n\n---\n\n");
+
+  const codeMapBlock = "IPTSP/ANS codes: " + JSON.stringify(CODE_MAP_ANS) +
+                        "\nA2P codes: " + JSON.stringify(CODE_MAP_A2P);
+
+  const systemPrompt = `You are a support-reply assistant for Infozillion Teletech BD's A2P SMS Hub (MNPSP) team.
+Your job: given a client/aggregator query and matched internal knowledge-base entries, draft a professional, ready-to-send reply
+in the same tone and structure as the company's existing templates (starts "Dear Concerned," or "Dear concerned,", polite, factual, references relevant IDs/fields with placeholders like <value> where specifics are unknown).
+
+Rules:
+- Ground your reply in the provided knowledge base context. Do not invent error codes or policies not present in the context.
+- If the context has a clearly matching entry, adapt its reply template rather than writing from scratch.
+- If nothing matches well, say so plainly and ask the client for the specific information needed (error code, request payload, timestamp, txn ID) to investigate further.
+- Keep it concise: a short diagnosis line + the reply. Output only the final reply text, no meta-commentary.`;
+
+  const userMsg = `Client query:\n"""${q}"""\n\nMatched knowledge base context:\n${contextBlock || "(no direct KB match found)"}\n\nReference code maps:\n${codeMapBlock}\n\nDraft the reply now.`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMsg }]
+      })
+    });
+    const data = await response.json();
+    const text = (data.content || []).map(b=>b.text||"").join("\n").trim();
+    aiOut.textContent = text || "AI theke kono response paini. Abar try koro.";
+  }catch(err){
+    aiOut.textContent = "Error generating reply: " + err.message + "\n\nNote: AI features only work when this tool is opened as a live artifact preview inside the Claude chat — not when downloaded and opened as a local file.";
+  }
+}
+
+function resetApp(){
+  // reset resolver tab
+  document.getElementById("query").value = "";
+  document.getElementById("results").innerHTML = '<div class="empty">Matching error code or FAQ entry will appear here.</div>';
+  document.getElementById("aiBox").classList.remove("show");
+  document.getElementById("aiOut").innerHTML = "";
+  Object.keys(activeVariantIndex).forEach(k=>delete activeVariantIndex[k]);
+
+  // reset email tab
+  document.getElementById("emailInput").value = "";
+  document.getElementById("emailName").value = "";
+  document.getElementById("emailType").selectedIndex = 0;
+  document.getElementById("emailTone").selectedIndex = 0;
+  document.getElementById("emailOutWrap").style.display = "none";
+  document.getElementById("emailSubject").textContent = "";
+  document.getElementById("emailBody").textContent = "";
+  document.getElementById("emailLoading").style.display = "none";
+
+  // reset maintenance notice panel
+  clearMaintenance();
+  switchEmailMode("general");
+
+  // back to resolver tab view
+  switchTab("resolver");
+  showToast("Tool reset");
+}
+
+function switchTab(tab){
+  document.getElementById("resolverView").classList.toggle("active", tab==="resolver");
+  document.getElementById("emailView").classList.toggle("active", tab==="email");
+  document.getElementById("tabBtnResolver").classList.toggle("active", tab==="resolver");
+  document.getElementById("tabBtnEmail").classList.toggle("active", tab==="email");
+}
+
+function switchEmailMode(mode){
+  document.getElementById("generalEmailPanel").classList.toggle("active", mode==="general");
+  document.getElementById("maintenancePanel").classList.toggle("active", mode==="maintenance");
+  document.getElementById("subtabGeneral").classList.toggle("active", mode==="general");
+  document.getElementById("subtabMaint").classList.toggle("active", mode==="maintenance");
+}
+
+function populateTimeSelects(){
+  const groups = ["actStart","actEnd","downStart","downEnd"];
+  groups.forEach(g=>{
+    const hourSel = document.getElementById(`${g}Hour`);
+    const minSel = document.getElementById(`${g}Min`);
+    const ampmSel = document.getElementById(`${g}Ampm`);
+    if(!hourSel || !minSel || !ampmSel) return;
+
+    hourSel.innerHTML = "";
+    for(let h=0; h<=12; h++){
+      const v = String(h).padStart(2,"0");
+      const opt = document.createElement("option");
+      opt.value = v; opt.textContent = v;
+      hourSel.appendChild(opt);
+    }
+    minSel.innerHTML = "";
+    for(let m=0; m<60; m++){
+      const v = String(m).padStart(2,"0");
+      const opt = document.createElement("option");
+      opt.value = v; opt.textContent = v;
+      minSel.appendChild(opt);
+    }
+    ampmSel.innerHTML = "";
+    ["AM","PM"].forEach(v=>{
+      const opt = document.createElement("option");
+      opt.value = v; opt.textContent = v;
+      ampmSel.appendChild(opt);
+    });
+  });
+  // sensible defaults
+  document.getElementById("actEndHour").value = "04";
+  document.getElementById("downStartMin").value = "30";
+  document.getElementById("downEndHour").value = "01";
+}
+populateTimeSelects();
+
+function readTimeGroup(prefix){
+  const h = document.getElementById(`${prefix}Hour`).value;
+  const m = document.getElementById(`${prefix}Min`).value;
+  const a = document.getElementById(`${prefix}Ampm`).value;
+  return `${h}:${m} ${a}`;
+}
+
+function formatMaintDate(){
+  const raw = document.getElementById("maintDate").value; // yyyy-mm-dd
+  if(!raw) return "";
+  const d = new Date(raw + "T00:00:00");
+  if(isNaN(d.getTime())) return raw;
+  return d.toLocaleDateString("en-US", {month:"long", day:"numeric", year:"numeric"});
+}
+
+function generatePocReply(){
+  const name = document.getElementById("pocName").value.trim();
+  const nameLine = name || "<name>";
+
+  const subject = "Re: Point of Contact (POC) Details";
+  const body =
+`Dear Concerned,
+
+Please find our Point of Contact (POC) details below for your reference:
+
+Service Assurance
+
+Mobile: +8801706-955428
+Email: dipping_support@infotelebd.com
+
+Best Regards,
+
+${nameLine}
+
+Senior Engineer, Service Assurance
+Infozillion Teletech BD Ltd.
+
+Hosaf High Tower, 12th Floor,
+9 Mohakhali C/A, Dhaka-1212, Bangladesh`;
+
+  document.getElementById("pocSubject").textContent = subject;
+  document.getElementById("pocBody").textContent = body;
+  document.getElementById("pocOutWrap").style.display = "grid";
+}
+
+function generateMaintenanceNotice(){
+  const mno = document.getElementById("maintMno").value;
+  const date = formatMaintDate();
+  const name = document.getElementById("maintName").value.trim();
+  const actStart = readTimeGroup("actStart");
+  const actEnd = readTimeGroup("actEnd");
+  const downStart = readTimeGroup("downStart");
+  const downEnd = readTimeGroup("downEnd");
+
+  if(!date){
+    showToast("Date select koro age");
+    return;
+  }
+
+  const actStartNo = actStart;
+  const actEndNo = actEnd;
+  const downStartNo = downStart;
+  const downEndNo = downEnd;
+
+  const signature = name ? `\n\nBest Regards,\n\n${name}\n\nSenior Engineer, Service Assurance\nInfozillion Teletech BD Ltd.\n\nHosaf High Tower, 12th Floor,\n9 Mohakhali C/A, Dhaka-1212, Bangladesh` : "";
+  const contact = `\n\nFor inquiries, please contact us via email or telephone.\n⏹️ Email: dipping_support@infotelebd.com\n⏹️ Mobile: +8801706955428`;
+
+  // ---- CLIENT ----
+  const clientSubject = `Maintenance Notification: Maintenance Activity by ${mno} on ${date}`;
+  const clientBody =
+`Dear Sir/Madam,
+
+Greetings from Infozillion Teletech BD.
+
+Please be advised that MNO ${mno} will undertake maintenance operations on its platform on ${date}, from ${actStart} to ${actEnd}. During the maintenance window, ${mno}'s A2P SMS service may experience downtime between ${downStart} and ${downEnd}.
+⏹️  Activity Window: ${date}, from ${actStart} to ${actEnd}.
+⏹️  ⁠Impact: ${mno}'s A2P SMS service may experience downtime between ${downStart} and ${downEnd}.
+
+Please note that this maintenance will be conducted by ${mno}. We are disseminating this message to avoid any potential ambiguity. You may contact them for additional information. ${mno}'s communication is included in the email thread for your reference.${contact}${signature}`;
+
+  // ---- TIRZOK (internal) ----
+  const tirzokSubject = `Maintenance Notification: Maintenance Activity by ${mno} on ${date}`;
+  const tirzokBody =
+`Dear Team,
+
+Greetings from Infozillion Teletech BD.
+
+Please be advised that MNO ${mno} will undertake maintenance operations on its platform on ${date}, from ${actStartNo} to ${actEndNo}. During the maintenance window, ${mno}'s A2P SMS service may experience downtime between ${downStartNo} and ${downEndNo}.
+⏹️  Activity Window: ${date}, from ${actStartNo} to ${actEndNo}.
+⏹️  ⁠Impact: ${mno}'s A2P SMS service may experience downtime between ${downStartNo} and ${downEndNo}.
+
+We will monitor the activity from our end, and if required, will ask for your support.  ${contact}${signature}`;
+
+  // ---- WHATSAPP (aggregators) ----
+  const whatsapp =
+`Dear Sir/Madam,
+
+Greetings from Infozillion Teletech BD.
+
+Please be advised that MNO ${mno} will undertake maintenance operations on its platform on ${date}, from ${actStartNo} to ${actEndNo}. During the maintenance window, ${mno}'s A2P SMS service may experience downtime between ${downStartNo} and ${downEndNo}.
+⏹️    ⁠Activity Window: ${date}, from ${actStartNo} to ${actEndNo}.
+⏹️    ⁠Impact: ${mno}'s A2P SMS service may experience downtime between ${downStartNo} and ${downEndNo}.
+
+Please note that this maintenance activity will be conducted by ${mno}. We are sharing this notification to avoid any potential confusion. For additional information, you may contact ${mno} directly.
+FYI, an email regarding this matter has also been sent to your registered email address.`;
+
+  document.getElementById("maintClientSubject").textContent = clientSubject;
+  document.getElementById("maintClientBody").textContent = clientBody;
+  document.getElementById("maintTirzokSubject").textContent = tirzokSubject;
+  document.getElementById("maintTirzokBody").textContent = tirzokBody;
+  document.getElementById("maintWhatsapp").textContent = whatsapp;
+  document.getElementById("maintOutWrap").style.display = "block";
+}
+
+function clearMaintenance(){
+  document.getElementById("maintDate").value = "";
+  document.getElementById("maintName").value = "";
+  document.getElementById("maintMno").selectedIndex = 0;
+  populateTimeSelects();
+  document.getElementById("maintOutWrap").style.display = "none";
+
+  document.getElementById("pocName").value = "";
+  document.getElementById("pocOutWrap").style.display = "none";
+}
+
+function copyPlain(elId){
+  const el = document.getElementById(elId);
+  copyToClipboard(el.innerText || el.textContent, "Copied");
+}
+
+function clearEmail(){
+  document.getElementById("emailInput").value = "";
+  document.getElementById("emailName").value = "";
+  document.getElementById("emailOutWrap").style.display = "none";
+}
+
+async function generateEmailDraft(){
+  const raw = document.getElementById("emailInput").value.trim();
+  if(!raw){ showToast("Age content/instruction likho"); return; }
+
+  const mailType = document.getElementById("emailType").value;
+  const tone = document.getElementById("emailTone").value;
+
+  const loading = document.getElementById("emailLoading");
+  const outWrap = document.getElementById("emailOutWrap");
+  loading.style.display = "block";
+  outWrap.style.display = "none";
+
+  // pull relevant KB context same way as resolver, so error-code mails stay accurate
+  const queryLower = raw.toLowerCase();
+  const tokens = tokenize(raw);
+  const topMatches = KB.map(entry=>({entry, score: scoreEntry(entry, queryLower, tokens)}))
+                        .filter(x=>x.score>0)
+                        .sort((a,b)=>b.score-a.score)
+                        .slice(0,4)
+                        .map(x=>x.entry);
+  const contextBlock = topMatches.map(e=>
+    `Title: ${e.title}\nReason: ${e.reason}\nTemplate: ${e.reply}`
+  ).join("\n\n---\n\n");
+
+  const typeLabelMap = {
+    reply:"a reply to a client/aggregator's incoming email",
+    new:"a new outgoing email initiating a topic",
+    escalation:"an escalation email to an MNO/IPTSP technical POC",
+    followup:"a polite follow-up/reminder email on an unresolved issue"
+  };
+  const toneLabelMap = {
+    standard:"standard, professional, neutral",
+    urgent:"urgent — conveys this needs prompt action, without being rude",
+    apologetic:"apologetic — acknowledges delay/inconvenience caused from our side",
+    firm:"firm — this has been raised before and remains unresolved, push for resolution"
+  };
+
+  const systemPrompt = `You are an email-drafting assistant for Infozillion Teletech BD's A2P SMS Hub (MNPSP) support/ops team.
+Draft a complete, ready-to-send email (Subject + Body) based on the user's input, which may be either:
+(a) a raw client/aggregator email to reply to, or
+(b) a short instruction describing what the mail should be about.
+
+Style: matches existing company templates — the body MUST always start with the exact line "Dear Concerned," followed by a blank line,
+then polite and factual content, referencing IDs/fields with placeholders like <value> where the specific data isn't given.
+
+Do NOT include any sign-off, closing line, or signature (no "Best Regards", no name, no company block) — that will be appended separately. End the body right after the last content paragraph.
+
+Ground technical claims (error codes, causes, procedures) in the provided knowledge-base context below — do not invent policies or codes not present there.
+If the input doesn't map to anything in the context, write a sensible, professional draft based on the input alone and don't force-fit unrelated KB content.
+
+Output format EXACTLY as:
+SUBJECT: <one line subject>
+BODY:
+<email body text, starting with "Dear Concerned," and ending after the last content paragraph, no sign-off>
+
+No other commentary before or after.`;
+
+  const userMsg = `Mail type: ${typeLabelMap[mailType]}\nDesired tone: ${toneLabelMap[tone]}\n\nUser input:\n"""${raw}"""\n\nRelevant knowledge base context:\n${contextBlock || "(no direct KB match — use general professional judgement)"}\n\nDraft the email now.`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMsg }]
+      })
+    });
+    const data = await response.json();
+    const text = (data.content || []).map(b=>b.text||"").join("\n").trim();
+
+    let subject = "";
+    let body = text;
+    const subMatch = text.match(/SUBJECT:\s*(.*)/i);
+    const bodyMatch = text.match(/BODY:\s*([\s\S]*)/i);
+    if(subMatch) subject = subMatch[1].trim();
+    if(bodyMatch) body = bodyMatch[1].trim();
+
+    // safety-net: always start with "Dear Concerned,"
+    if(!/^dear concerned,/i.test(body)){
+      body = "Dear Concerned,\n\n" + body;
+    }
+
+    // append fixed signature block if name provided
+    const nameVal = document.getElementById("emailName").value.trim();
+    if(nameVal){
+      body += `\n\nFor inquiries, please contact us via email or mobile.\n⏹ Email:   dipping_support@infotelebd.com                   \n⏹ Mobile: +8801706955428\n\nBest Regards,\n\n${nameVal}\n\nSenior Engineer, Service Assurance\nInfozillion Teletech BD Ltd.\n\nHosaf High Tower, 12th Floor,\n9 Mohakhali C/A, Dhaka-1212, Bangladesh`;
+    }
+
+    document.getElementById("emailSubject").textContent = subject || "(no subject generated)";
+    document.getElementById("emailBody").textContent = body;
+    outWrap.style.display = "grid";
+  }catch(err){
+    document.getElementById("emailSubject").textContent = "";
+    document.getElementById("emailBody").textContent = "Error generating email: " + err.message + "\n\nNote: AI features only work when this tool is opened as a live artifact preview inside the Claude chat — not when downloaded and opened as a local file.";
+    outWrap.style.display = "grid";
+  }finally{
+    loading.style.display = "none";
+  }
+}
+</script>
+<script>
+function resetAll() {
+  // Clear query
+  var q = document.getElementById('query') || document.querySelector('input[type="text"]');
+  if (q) q.value = '';
+  // Clear results  
+  var r = document.getElementById('results') || document.querySelector('.results');
+  if (r) r.innerHTML = '';
+  // Clear all textareas
+  document.querySelectorAll('textarea').forEach(function(t){ t.value = ''; });
+  // Hide output sections
+  document.querySelectorAll('.output-section, .ai-section, .email-section, [id*="output"], [id*="preview"]').forEach(function(el){
+    el.style.display = 'none';
+    el.innerHTML = '';
+  });
+}
+</script>
+</body>
+</html>
