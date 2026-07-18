@@ -12,9 +12,8 @@ const DLR_CODES = [
   { code: '1020', label: '1020 Internal Server Error' },
   { code: '1052', label: '1052 Submission record not found' }
 ];
-const LS_DRAFT   = 'msr_draft_v2';
-const LS_HISTORY = 'msr_history_v2';
 const LS_DRAFT   = 'msr_draft';
+const LS_HISTORY = 'msr_history_v2';
 
 const togState = {};
 let autoSaveTimer = null;
@@ -37,7 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ── Date ───────────────────────────────────────────────── */
 function initDate() {
   const el = document.getElementById('rep-date');
-  if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
+  if (el && !el.value) {
+    // Report Date = yesterday (we always report previous day)
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    el.value = yesterday.toISOString().slice(0, 10);
+  }
 }
 
 /* ── Collapse ───────────────────────────────────────────── */
