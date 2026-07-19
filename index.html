@@ -88,24 +88,24 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sidebar-copyright{padding:10px 20px 16px;font-size:10px;color:var(--text-3);font-family:var(--mono);line-height:1.6;border-top:1px solid var(--border)}
 
 /* ── STATS BAR ── */
-.stats-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:50}
-.stat-item{display:flex;align-items:center;gap:10px;padding:12px 20px;border-right:1px solid var(--border);flex-shrink:0}
-.stat-item:first-child{padding-left:0}
-.stat-item:last-child{border-right:none}
-.stat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stat-icon svg{width:14px;height:14px}
-.stat-body{}
-.stat-label{font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-3);line-height:1}
-.stat-value{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-0.01em;margin-top:2px}
-.stat-sub{font-family:var(--mono);font-size:10px;color:var(--text-3);margin-top:1px}
-.stats-bar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.stats-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:50;height:56px}
+.stat-pill{display:flex;flex-direction:column;justify-content:center;padding:0 24px;flex-shrink:0;min-width:120px}
+.stat-pill:first-child{padding-left:4px}
+.stat-divider{width:1px;height:32px;background:var(--border);flex-shrink:0}
+.sp-label{font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);line-height:1;margin-bottom:5px}
+.sp-value{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.02em;line-height:1;display:flex;align-items:baseline;gap:6px}
+.sp-sub{font-family:var(--mono);font-size:11px;color:var(--text-3);font-weight:400;margin-top:3px;display:block}
+.stats-bar-right{margin-left:auto;padding-left:24px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px}
+.greeting-line{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-0.01em}
+.quote-line{font-size:11px;color:var(--text-3);font-style:italic;line-height:1.5;cursor:pointer;transition:color 0.2s;max-width:300px;text-align:right}
+.quote-line:hover{color:var(--text-2)}
 .greeting-wrap{text-align:right;max-width:340px}
 .greeting-line{font-size:13px;font-weight:600;color:var(--text);letter-spacing:-0.01em;margin-bottom:3px}
 .quote-line{font-size:11px;color:var(--text-3);font-style:italic;line-height:1.5;cursor:pointer;transition:color 0.2s}
 .quote-line:hover{color:var(--text-2)}
 
 /* card hover color wash */
-.tool-card-body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1;transition:background 0.2s}
+.tool-card-body{display:flex;flex-direction:column;flex:1}
 .tool-card:hover .tool-card-body{background:color-mix(in srgb, var(--card-bg,var(--surface-2)) 40%, var(--surface) 60%)}
 .tool-card:hover .tool-card-name{color:var(--card-accent,var(--text))}
 
@@ -115,39 +115,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .hub-dashboard.hidden{display:none}
 
 /* dashboard content */
-.dash-content{padding:28px 32px}
-.dashboard-hero{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.dashboard-hero-left{}
-.dashboard-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
-.dashboard-headline{font-family:var(--serif);font-size:30px;line-height:1.2;color:var(--text);margin-bottom:6px}
+.dash-content{padding:16px 28px 20px}
+.dashboard-hero{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.dashboard-hero-left{display:flex;flex-direction:column;gap:6px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3)}
+.hero-dot{width:5px;height:5px;border-radius:50%;background:var(--text-3);flex-shrink:0}
+.dashboard-headline{font-family:var(--serif);font-size:26px;line-height:1.2;color:var(--text);letter-spacing:-0.01em}
 .dashboard-headline em{font-style:italic;color:var(--text-2)}
-.dashboard-sub{font-size:13px;color:var(--text-2);line-height:1.6;max-width:460px}
+.dashboard-sub{font-size:12px;color:var(--text-3);line-height:1.65;margin-top:2px}
 
 /* search results */
 .search-results-label{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:14px;display:none}
 .search-results-label.show{display:block}
 
 /* tools grid */
-.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px}
-.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:0;cursor:pointer;transition:box-shadow 0.2s ease,transform 0.2s ease,border-color 0.15s;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.tools-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:auto auto auto;gap:10px;margin-bottom:24px}
+.tool-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .18s,transform .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
 .tool-card::after{content:'';position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0);transition:box-shadow 0.15s}
-.tool-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.10),0 2px 8px rgba(0,0,0,0.06);transform:translateY(-3px);border-color:var(--card-bdr,var(--border-md))}
+.tool-card:hover{border-color:var(--card-bdr,var(--border-md));transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.08)}
 .tool-card.hidden{display:none}
+.tool-card.tc1{grid-column:1;grid-row:1}
+.tool-card.tc2{grid-column:2;grid-row:1}
+.tool-card.tc3{grid-column:3;grid-row:1}
+.tool-card.tc4{grid-column:1;grid-row:2}
+.tool-card.tc5{grid-column:4;grid-row:1}
+.tool-card.tc6{grid-column:2;grid-row:2}
+.tool-card.tc7{grid-column:3/5;grid-row:2}
+.tool-card.tc7 .tc7-inner{display:flex;align-items:center;gap:20px;flex:1}
+.tool-card.tc7 .tool-card-features{flex-wrap:nowrap}
 /* card color strip */
-.tool-card-strip{height:4px;background:var(--card-accent,var(--text));width:100%;border-radius:14px 14px 0 0;flex-shrink:0}
+.tool-card-strip{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;background:var(--card-accent,var(--text))}
 
 .tool-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
-.tool-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card-bg,var(--surface-2));color:var(--card-accent,var(--text));flex-shrink:0;border:1px solid var(--card-bdr,var(--border))}
-.tool-card-icon svg{width:20px;height:20px}
+.tool-card-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--card-bg,var(--surface-2));color:var(--card-accent,var(--text));flex-shrink:0;border:0.5px solid var(--card-bdr,var(--border))}
+.tool-card-icon svg{width:18px;height:18px}
 .tool-card-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
 .tool-card-badge{font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:20px;background:var(--card-bg,var(--surface-2));color:var(--card-accent,var(--text-2));border:1px solid var(--card-bdr,var(--border));font-weight:500;letter-spacing:0.02em}
 .tool-card-last-used{font-family:var(--mono);font-size:9px;color:var(--text-3);text-align:right;letter-spacing:0.02em}
-.tool-card-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.02em;margin-bottom:2px;line-height:1.3}
-.tool-card-tagline{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-bottom:10px;letter-spacing:0.02em}
-.tool-card-desc{font-size:12.5px;color:var(--text-2);line-height:1.65;margin-bottom:14px;flex:1}
-.tool-card-features{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px}
-.feature-pill{font-size:11px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-weight:500;letter-spacing:0.01em}
-.tool-card-cta{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);margin-top:auto}
+.tool-card-name{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-0.01em;margin-bottom:2px;line-height:1.3}
+.tool-card-tagline{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.02em}
+.tool-card-desc{display:none}
+.tool-card-features{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0;margin-top:4px}
+.feature-pill{font-size:10px;background:var(--surface-2);color:var(--text-2);border:0.5px solid var(--border);border-radius:4px;padding:2px 7px;font-weight:400}
+.tool-card-cta{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:0.5px solid var(--border);margin-top:auto}
 .tool-card-open{font-size:12px;font-weight:600;color:var(--card-accent,var(--text));display:flex;align-items:center;gap:5px}
 .tool-card-open svg{width:13px;height:13px;transition:transform 0.15s}
 .tool-card:hover .tool-card-open svg{transform:translateX(4px)}
@@ -246,7 +256,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
   <div class="hub-header-right">
-    <span class="hub-clock" id="clock"></span>
     <button class="hub-shortcut-btn" onclick="showShortcuts()" title="Keyboard shortcuts (?)">?</button>
     <span class="hub-version">v3.0.0</span>
   </div>
@@ -310,20 +319,20 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <span class="tool-nav-shortcut">3</span>
     </div>
 
-    <div class="tool-nav-item" id="nav-cp" style="--active-color:#6D28D9;" onclick="openTool('cp')">
-      <div class="tool-nav-dot" style="background:var(--c-cp)"></div>
-      <div class="tool-nav-info">
-        <div class="tool-nav-name">ANS Msg JSON</div>
-        <div class="tool-nav-desc">A2P · ELK Log · Converter</div>
-      </div>
-      <span class="tool-nav-shortcut">4</span>
-    </div>
-
     <div class="tool-nav-item" id="nav-ip" style="--active-color:#0369A1;" onclick="openTool('ip')">
       <div class="tool-nav-dot" style="background:var(--c-ip)"></div>
       <div class="tool-nav-info">
         <div class="tool-nav-name">IP Whitelist Request</div>
         <div class="tool-nav-desc">Activate · Deactivate · Email/WA</div>
+      </div>
+      <span class="tool-nav-shortcut">4</span>
+    </div>
+
+    <div class="tool-nav-item" id="nav-cp" style="--active-color:#6D28D9;" onclick="openTool('cp')">
+      <div class="tool-nav-dot" style="background:var(--c-cp)"></div>
+      <div class="tool-nav-info">
+        <div class="tool-nav-name">ANS Msg JSON</div>
+        <div class="tool-nav-desc">A2P · ELK Log · Converter</div>
       </div>
       <span class="tool-nav-shortcut">5</span>
     </div>
@@ -367,44 +376,26 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
       <!-- STATS BAR -->
       <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-icon" style="background:#F0EFE9;color:#6B6860">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          </div>
-          <div class="stat-body">
-            <div class="stat-label">Report Date</div>
-            <div class="stat-value" id="stat-date">—</div>
-          </div>
+        <div class="stat-pill">
+          <span class="sp-label">Report Date</span>
+          <span class="sp-value" id="stat-date">—</span>
         </div>
-        <div class="stat-item">
-          <div class="stat-icon" style="background:#F0EFE9;color:#6B6860">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          </div>
-          <div class="stat-body">
-            <div class="stat-label">Shift Time</div>
-            <div class="stat-value" id="stat-time">—</div>
-            <div class="stat-sub" id="stat-shift">—</div>
-          </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="sp-label">Shift Time</span>
+          <span class="sp-value" id="stat-time">—</span>
+          <span class="sp-sub" id="stat-shift">—</span>
         </div>
-        <div class="stat-item">
-          <div class="stat-icon" style="background:#EBF7F1;color:#1A6B3C">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          </div>
-          <div class="stat-body">
-            <div class="stat-label">Total Tools</div>
-            <div class="stat-value">7</div>
-            <div class="stat-sub">Available</div>
-          </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="sp-label">Total Tools</span>
+          <span class="sp-value">7 <span class="sp-sub" style="font-size:11px">Available</span></span>
         </div>
-        <div class="stat-item">
-          <div class="stat-icon" style="background:#EFF6FF;color:#1D4ED8">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div class="stat-body">
-            <div class="stat-label">Team</div>
-            <div class="stat-value">Service Assurance</div>
-            <div class="stat-sub" id="stat-last-used">—</div>
-          </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="sp-label">Team</span>
+          <span class="sp-value">Service Assurance</span>
+          <span class="sp-sub" id="stat-last-used">—</span>
         </div>
         <div class="stats-bar-right">
           <div class="greeting-wrap">
@@ -417,9 +408,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="dash-content">
         <div class="dashboard-hero">
           <div class="dashboard-hero-left">
-            <div class="dashboard-eyebrow">Service Assurance · Operations Hub</div>
-            <h1 class="dashboard-headline">Built for ops.<br><em>Made to move fast.</em></h1>
-            <p class="dashboard-sub">Shift reports, monitoring, traffic analytics, and A2P log tools — all accessible from a single link.</p>
+            <div>
+              <div class="dashboard-eyebrow">Service Assurance · Operations Hub</div>
+              <h1 class="dashboard-headline">Built for ops. <em>Made to move fast.</em></h1>
+            </div>
+            <p class="dashboard-sub">Shift reports, monitoring, traffic analytics, and A2P log tools — all in one place.</p>
           </div>
         </div>
 
@@ -427,9 +420,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
         <div class="tools-grid" id="toolsGrid">
 
-          <div class="tool-card" data-search="daily shift report elk csv 9xxx 1xxx 4xx 5xx dlr delay drive backup" style="--card-accent:#1A6B3C;--card-bg:#EBF7F1;--card-bdr:#B4DEC9;" onclick="openTool('daily')">
+          <div class="tool-card tc1" data-search="daily shift report elk csv 9xxx 1xxx 4xx 5xx dlr delay drive backup" style="--card-accent:#1A6B3C;--card-bg:#EBF7F1;--card-bdr:#B4DEC9;" onclick="openTool('daily')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M13 21H17m-2-2v2m-4-8h8m-8 3h4"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div>
               <div class="tool-card-header-right">
@@ -445,12 +437,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               <span class="tool-card-shortcut">Press 1</span>
             </div>
-            </div>
           </div>
 
-          <div class="tool-card" data-search="morning shift report handover google sheets traffic network p2p dlr delay auto-save" style="--card-accent:#1D4ED8;--card-bg:#EFF6FF;--card-bdr:#BDD0FD;" onclick="openTool('morning')">
+          <div class="tool-card tc2" data-search="morning shift report handover google sheets traffic network p2p dlr delay auto-save" style="--card-accent:#1D4ED8;--card-bg:#EFF6FF;--card-bdr:#BDD0FD;" onclick="openTool('morning')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v1m0 16v1M4.22 4.22l.7.7m12.16 12.16.7.7M3 12h1m16 0h1M4.22 19.78l.7-.7m12.16-12.16.7-.7"/><circle cx="12" cy="12" r="4"/></svg></div>
               <div class="tool-card-header-right">
@@ -466,12 +456,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               <span class="tool-card-shortcut">Press 2</span>
             </div>
-            </div>
           </div>
 
-          <div class="tool-card" data-search="mnp status report nagios disk memory swap infrastructure monitoring" style="--card-accent:#92400E;--card-bg:#FFFBEB;--card-bdr:#FCD34D;" onclick="openTool('mnp')">
+          <div class="tool-card tc3" data-search="mnp status report nagios disk memory swap infrastructure monitoring" style="--card-accent:#92400E;--card-bg:#FFFBEB;--card-bdr:#FCD34D;" onclick="openTool('mnp')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2.5"/><path d="M8 21h8M12 17v4M6 7h4M6 11h8"/></svg></div>
               <div class="tool-card-header-right">
@@ -487,12 +475,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               <span class="tool-card-shortcut">Press 3</span>
             </div>
-            </div>
           </div>
 
-          <div class="tool-card" data-search="ans msg json a2p elk log converter mno iptsp syntax highlight clipboard" style="--card-accent:#6D28D9;--card-bg:#F3F0FF;--card-bdr:#C4B5FD;" onclick="openTool('cp')">
+          <div class="tool-card tc4" data-search="ans msg json a2p elk log converter mno iptsp syntax highlight clipboard" style="--card-accent:#6D28D9;--card-bg:#F3F0FF;--card-bdr:#C4B5FD;" onclick="openTool('cp')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="6" rx="1.5"/><path d="M9 14l2 2 4-4"/></svg></div>
               <div class="tool-card-header-right">
@@ -506,14 +492,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
             <div class="tool-card-features"><span class="feature-pill">ELK Log</span><span class="feature-pill">MNO/IPTSP</span><span class="feature-pill">JSON Convert</span><span class="feature-pill">Syntax Highlight</span></div>
             <div class="tool-card-cta">
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-              <span class="tool-card-shortcut">Press 4</span>
-            </div>
+              <span class="tool-card-shortcut">Press 5</span>
             </div>
           </div>
 
-          <div class="tool-card" data-search="ip whitelist request activate deactivate geo verify screenshot email wa message bulk" style="--card-accent:#0369A1;--card-bg:#EFF8FF;--card-bdr:#BAE0FD;" onclick="openTool('ip')">
+          <div class="tool-card tc5" data-search="ip whitelist request activate deactivate geo verify screenshot email wa message bulk" style="--card-accent:#0369A1;--card-bg:#EFF8FF;--card-bdr:#BAE0FD;" onclick="openTool('ip')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
               <div class="tool-card-header-right">
@@ -527,14 +511,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
             <div class="tool-card-features"><span class="feature-pill">Bulk IP</span><span class="feature-pill">Geo Verify</span><span class="feature-pill">Screenshot</span><span class="feature-pill">Email</span><span class="feature-pill">WA</span></div>
             <div class="tool-card-cta">
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-              <span class="tool-card-shortcut">Press 5</span>
-            </div>
+              <span class="tool-card-shortcut">Press 4</span>
             </div>
           </div>
 
-          <div class="tool-card" data-search="a2p support resolver kb knowledge base ai reply email composer 9xxx 1xxx error code faq" style="--card-accent:#0D7A6C;--card-bg:#F0F8F6;--card-bdr:#A9D8D1;" onclick="openTool('support')">
+          <div class="tool-card tc6" data-search="a2p support resolver kb knowledge base ai reply email composer 9xxx 1xxx error code faq" style="--card-accent:#0D7A6C;--card-bg:#F0F8F6;--card-bdr:#A9D8D1;" onclick="openTool('support')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
             <div class="tool-card-header">
               <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></div>
               <div class="tool-card-header-right">
@@ -550,27 +532,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               <span class="tool-card-shortcut">Press 6</span>
             </div>
-            </div>
           </div>
 
-          <div class="tool-card" data-search="ans traffic report mno iptsp kibana cdr google sheets daily success error" style="--card-accent:#00A878;--card-bg:#F0FDF9;--card-bdr:#86EFCD;" onclick="openTool('ans')">
+          <div class="tool-card tc7" data-search="ans traffic report mno iptsp kibana cdr google sheets daily success error" style="--card-accent:#00A878;--card-bg:#F0FDF9;--card-bdr:#86EFCD;" onclick="openTool('ans')">
             <div class="tool-card-strip"></div>
-            <div class="tool-card-body">
-            <div class="tool-card-header">
-              <div class="tool-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 16 4-4 4 4 4-4"/></svg></div>
-              <div class="tool-card-header-right">
+            <div class="tc7-inner">
+              <div class="tool-card-icon" style="width:42px;height:42px;font-size:22px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 16 4-4 4 4 4-4"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <div class="tool-card-name">ANS Traffic Report</div>
+                <div class="tool-card-tagline">MNO · IPTSP · Daily CDR · Kibana</div>
+                <div class="tool-card-features" style="flex-wrap:nowrap"><span class="feature-pill">4 MNO</span><span class="feature-pill">18 IPTSP</span><span class="feature-pill">Success/Error</span><span class="feature-pill">Sheets Copy</span><span class="feature-pill">CSV Export</span></div>
+              </div>
+              <div class="tool-card-header-right" style="align-self:flex-start;flex-shrink:0">
                 <span class="tool-card-badge">v2.4</span>
                 <span class="tool-card-last-used" id="lu-ans">Never used</span>
               </div>
             </div>
-            <div class="tool-card-name">ANS Traffic Report</div>
-            <div class="tool-card-tagline">MNO · IPTSP · Daily CDR</div>
-            <div class="tool-card-desc">Enter Kibana document counts to instantly generate MNO and IPTSP CDR daily traffic reports in Google Sheets-ready format.</div>
-            <div class="tool-card-features"><span class="feature-pill">4 MNO</span><span class="feature-pill">18 IPTSP</span><span class="feature-pill">Success/Error</span><span class="feature-pill">Sheets Copy</span></div>
             <div class="tool-card-cta">
               <span class="tool-card-open">Open Tool <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               <span class="tool-card-shortcut">Press 7</span>
-            </div>
             </div>
           </div>
 
@@ -687,8 +667,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <div class="shortcut-row"><span class="shortcut-desc">Daily Shift Report</span><div class="shortcut-keys"><span class="kbd">1</span></div></div>
       <div class="shortcut-row"><span class="shortcut-desc">Morning Shift Report</span><div class="shortcut-keys"><span class="kbd">2</span></div></div>
       <div class="shortcut-row"><span class="shortcut-desc">MNP Status Report</span><div class="shortcut-keys"><span class="kbd">3</span></div></div>
-      <div class="shortcut-row"><span class="shortcut-desc">ANS Msg JSON</span><div class="shortcut-keys"><span class="kbd">4</span></div></div>
-      <div class="shortcut-row"><span class="shortcut-desc">IP Whitelist Request</span><div class="shortcut-keys"><span class="kbd">5</span></div></div>
+      <div class="shortcut-row"><span class="shortcut-desc">IP Whitelist Request</span><div class="shortcut-keys"><span class="kbd">4</span></div></div>
+      <div class="shortcut-row"><span class="shortcut-desc">ANS Msg JSON</span><div class="shortcut-keys"><span class="kbd">5</span></div></div>
       <div class="shortcut-row"><span class="shortcut-desc">A2P Support Resolver</span><div class="shortcut-keys"><span class="kbd">6</span></div></div>
       <div class="shortcut-row"><span class="shortcut-desc">ANS Traffic Report</span><div class="shortcut-keys"><span class="kbd">7</span></div></div>
     </div>
@@ -926,7 +906,7 @@ searchEl.addEventListener('keydown', e => {
 /* ── KEYBOARD SHORTCUTS ── */
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  const map = {'1':'daily','2':'morning','3':'mnp','4':'cp','5':'ip','6':'support','7':'ans'};
+  const map = {'1':'daily','2':'morning','3':'mnp','4':'ip','5':'cp','6':'support','7':'ans'};
   if (map[e.key]) openTool(map[e.key]);
   else if (e.key === 'Escape') { showDashboard(); hideShortcuts(); }
   else if (e.key === '?') showShortcuts();
@@ -987,7 +967,12 @@ function initQuote() {
   const greet = document.getElementById('greeting-line');
   if (greet) {
     const h = new Date().getHours();
-    const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    let g;
+    if      (h >= 5  && h < 12) g = 'Good morning';
+    else if (h >= 12 && h < 13) g = 'Good noon';
+    else if (h >= 13 && h < 17) g = 'Good afternoon';
+    else if (h >= 17 && h < 21) g = 'Good evening';
+    else                         g = 'Good night';
     greet.textContent = g + ', Team 👋';
   }
   // rotating quote
