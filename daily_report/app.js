@@ -585,7 +585,7 @@ function buildScreenshot1(prefix){
 // ═══════════════════════════════════════════════════════════════════
 // 4XX / 5XX HTTP
 // ═══════════════════════════════════════════════════════════════════
-const HTTP_SOURCES=["GP","RB","BL","TT","ADN","FN","MN","BR","RT","AIT","MTN","PRM","RCO","BN","WBL","RDT","BOS","BTC","LNK","ICO","AGI","ICC"];
+const HTTP_SOURCES=["GP","RB","BL","TT","ADN","FN","MN","BR","RT","AIT","MTN","PRM","RCO","BN","WBL","RDT","BOS","BTC","LNK","ICO","AGI","ICC","RGI"];
 const HTTP_CODES=["400","401","402","403","404","500","501","502","503","504"];
 
 function buildHTTPSources(){
