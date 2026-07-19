@@ -1014,11 +1014,16 @@ function resetTool(key) {
   if (!iframe) { showToast('Tool not loaded yet', 'warning'); return; }
 
   const t = TOOLS[key];
-  // Reload the iframe — clears all state, works on file:// and http://
+  let path = t.path;
+
+  // Morning shift needs a fresh-start signal since it restores from localStorage on load
+  if (key === 'morning') {
+    path = t.path + '?fresh=1&_=' + Date.now();
+  }
+
   iframe.src = '';
   setTimeout(() => {
-    iframe.src = t.path;
-    // Show skeleton while reloading
+    iframe.src = path;
     const loadEl = document.getElementById('loading-' + key);
     if (loadEl) loadEl.classList.remove('hidden');
   }, 50);

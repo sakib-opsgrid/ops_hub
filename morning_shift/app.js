@@ -20,7 +20,14 @@ let autoSaveTimer = null;
 
 /* ── DOM Ready ──────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  // theme removed
+  // If hub triggered a reset (?fresh=1), wipe saved draft before restoring anything
+  if (new URLSearchParams(window.location.search).get('fresh') === '1') {
+    localStorage.removeItem(LS_DRAFT);
+    // Clean the URL so a manual refresh doesn't keep wiping the draft
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
   initDate();
   initToggles();
   buildHttp5xxSources();
