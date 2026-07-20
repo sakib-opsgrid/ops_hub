@@ -1379,7 +1379,39 @@ document.addEventListener('DOMContentLoaded',()=>{
   buildHTTPSources();
   refreshHTTP();
   initDelay();
+  initUploadZoneDragDrop();
 });
+
+/* ── Generic drag-and-drop for all .upload-zone boxes (9xxx, 1xxx, 4xx/5xx HTTP, DLR) ── */
+function initUploadZoneDragDrop() {
+  document.querySelectorAll('.upload-zone').forEach(zone => {
+    const fileInput = zone.querySelector('input[type="file"]');
+    if (!fileInput) return;
+
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', e => {
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over');
+    });
+
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (!files || !files.length) return;
+      // Assign dropped file to the input, then fire its existing onchange handler
+      const dt = new DataTransfer();
+      dt.items.add(files[0]);
+      fileInput.files = dt.files;
+      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
 
 /* ── WA Preview Modal ─────────────────────────── */
 function showWaModal(text) {
