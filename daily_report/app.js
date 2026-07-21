@@ -4,6 +4,29 @@
    © 2026 Nickson Rizvi (Najmaz Sakib) · Infozillion Teletech BD
    ================================================================ */
 
+// ── CORE UTILITIES (previously missing — caused entire script to crash on load) ──
+
+// Zero-pad a number to 2 digits: pad(7) → "07"
+function pad(n){ return String(n).padStart(2,'0'); }
+
+// Escape HTML special characters before inserting text into innerHTML (XSS-safe)
+function esc(str){
+  return String(str ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+
+// Toast notification — uses the #toast element + .toast--show class from style.css
+let _toastTimer = null;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('toast--show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('toast--show'), 2400);
+}
+
 // ── CLOCK ─────────────────────────────────────────────────────────
 
 
@@ -1384,9 +1407,19 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 /* ── Generic drag-and-drop for all .upload-zone boxes (9xxx, 1xxx, 4xx/5xx HTTP, DLR) ── */
 function initUploadZoneDragDrop() {
+  // Direct zone → parser mapping (no dependency on reconstructing input.files via DataTransfer)
+  const ZONE_HANDLERS = {
+    'zone-9mno':   file => parse9xxx(file, 'mno'),
+    'zone-9iptsp': file => parse9xxx(file, 'iptsp'),
+    'zone-1mno':   file => parse1xxx(file, 'mno'),
+    'zone-1iptsp': file => parse1xxx(file, 'iptsp'),
+    'zone-http':   file => parseHTTPcsv(file),
+    'zone-dlr':    file => parseDLR(file),
+  };
+
   document.querySelectorAll('.upload-zone').forEach(zone => {
-    const fileInput = zone.querySelector('input[type="file"]');
-    if (!fileInput) return;
+    const handler = ZONE_HANDLERS[zone.id];
+    if (!handler) return;
 
     zone.addEventListener('dragover', e => {
       e.preventDefault();
@@ -1402,13 +1435,14 @@ function initUploadZoneDragDrop() {
       e.preventDefault();
       e.stopPropagation();
       zone.classList.remove('drag-over');
-      const files = e.dataTransfer.files;
+      const files = e.dataTransfer && e.dataTransfer.files;
       if (!files || !files.length) return;
-      // Assign dropped file to the input, then fire its existing onchange handler
-      const dt = new DataTransfer();
-      dt.items.add(files[0]);
-      fileInput.files = dt.files;
-      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+      const file = files[0];
+      if (!file.name.toLowerCase().endsWith('.csv')) {
+        showToast('Please drop a .csv file');
+        return;
+      }
+      handler(file);
     });
   });
 }
