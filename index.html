@@ -303,11 +303,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <span class="tool-nav-shortcut">2</span>
     </div>
     <div class="sub-nav" id="sub-morning">
-      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)">HTTP Status</div>
-      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)">Delay / DLR</div>
-      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)">Network P2P</div>
-      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)">Client Comms</div>
-      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)">Traffic Trend</div>
+      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)" onclick="openToolTab('morning','http')">HTTP Status</div>
+      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)" onclick="openToolTab('morning','dlr')">Delay / DLR</div>
+      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)" onclick="openToolTab('morning','network')">Network P2P</div>
+      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)" onclick="openToolTab('morning','comms')">Client Comms</div>
+      <div class="sub-nav-item" style="--sub-accent:var(--c-morning)" onclick="openToolTab('morning','traffic')">Traffic Trend</div>
     </div>
 
     <div class="tool-nav-item" id="nav-mnp" style="--active-color:#92400E;" onclick="openTool('mnp')">
@@ -762,7 +762,16 @@ function openToolTab(key, tab) {
     if (!iframe || !iframe.contentWindow) return;
     try {
       const win = iframe.contentWindow;
-      if (win && typeof win.switchTab === 'function') win.switchTab(tab);
+      if (key === 'morning') {
+        // Morning Shift Report uses collapsible cards, not tabs — scroll to + expand the section
+        const card = win.document.getElementById('card-' + tab);
+        if (card) {
+          card.classList.remove('collapsed');
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (typeof win.switchTab === 'function') {
+        win.switchTab(tab);
+      }
     } catch(e) {}
     // highlight active sub-nav item
     const subNav = document.getElementById('sub-' + key);
