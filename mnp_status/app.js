@@ -428,10 +428,38 @@ function showToast(msg) {
 ══════════════════════════════════════════ */
 function copyWhatsApp() {
   const text = document.getElementById('plain').textContent;
-  navigator.clipboard.writeText(text)
-    .then(()  => showToast('✓ Copied — paste into WhatsApp'))
-    .catch(()  => showToast('✗ Copy failed, try manually'));
+  showWaModal(text);
 }
+
+/* ── WA Preview Modal ─────────────────────────────────── */
+function showWaModal(text) {
+  const overlay = document.getElementById('wa-modal-overlay');
+  const pre = document.getElementById('wa-modal-content');
+  if (!overlay || !pre) return;
+  pre.textContent = text;
+  overlay.style.display = 'flex';
+}
+function closeWaModal() {
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+function copyFromModal() {
+  const pre = document.getElementById('wa-modal-content');
+  const btn = document.getElementById('wa-modal-copy-btn');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    if (btn) { btn.textContent = 'Copied ✓'; btn.style.background = '#1A6B3C'; }
+    setTimeout(() => { if (btn) { btn.textContent = 'Copy to Clipboard'; btn.style.background = '#1A1916'; } }, 2000);
+    showToast('✓ Copied — paste into WhatsApp');
+  }).catch(() => showToast('✗ Copy failed, try manually'));
+}
+document.addEventListener('click', e => {
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (e.target === overlay) closeWaModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeWaModal();
+});
 
 function exportTxt() {
   const text = document.getElementById('plain').textContent;
