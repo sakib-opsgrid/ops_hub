@@ -189,7 +189,7 @@ function applyThreshold1(prefix, clientTotals, clientBreakdown){
 
 // ── STATUS TOGGLE ─────────────────────────────────────────────────
 const statusMap={};
-['9mno','9iptsp','1mno','1iptsp','http','dlr'].forEach(p=>{statusMap[p]='Normal';});
+['9mno','9iptsp','1mno','1iptsp','http','dlrmno','dlriptsp'].forEach(p=>{statusMap[p]='Normal';});
 
 function setSt(prefix,val){
   statusMap[prefix]=val;
@@ -291,11 +291,11 @@ function copyReportText(typeLabel, prefix, btn){
   const toTime   = document.getElementById(`${isNine?'9xxx':'1xxx'}-to-time`).value;
   const period = `${fmtDT(fromDate,fromTime)} - ${fmtDT(toDate,toTime)}`;
   const text = `${typeLabel},\n${period}\n\nReporter: ${reporter}\nStatus  : ${statusStr}`;
-  showWaModal(text);
   navigator.clipboard.writeText(text).then(()=>{
     const orig=btn.textContent; btn.textContent='Copied ✓';
+    showToast('Copied — paste into WhatsApp');
     setTimeout(()=>btn.textContent=orig,2000);
-  });
+  }).catch(()=>showToast('Copy failed — try again'));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -760,41 +760,77 @@ function generateHTTP(){
 // ═══════════════════════════════════════════════════════════════════
 // DLR
 // ═══════════════════════════════════════════════════════════════════
-const DLR_KNOWN={'1000':'Success','1020':'Internal Server Error','1052':'Submission record not found'};
-let dlrData={};
+const DLR_KNOWN={
+  '1000':'Success',
+  '1001':'IP Blacklist',
+  '1002':'Invalid Username',
+  '1003':'Invalid Password',
+  '1004':'Parameter missing',
+  '1005':'Invalid Parameter',
+  '1006':'CLI/Masking Invalid',
+  '1007':'Account Barred',
+  '1008':'Insufficient Balance',
+  '1009':'DND User',
+  '1010':'Invalid MSISDN',
+  '1011':'Duplicate Transaction ID',
+  '1012':'Message lengths exceed',
+  '1013':'No Request found',
+  '1014':'Delivery pending',
+  '1015':'TPS Limit Exceeded',
+  '1016':'Number Barred',
+  '1017':'API is not allowed for user',
+  '1018':'No Live Campaign',
+  '1019':'Messagebody Invalid',
+  '1020':'Internal Server Error',
+  '1021':'CLI/Masking Already Exists',
+  '1050':'Allowed campaigns limit exceeded',
+  '1051':'Allowed SMS quota is completed',
+  '1052':'Submission record not found',
+  '1053':'Invalid Transaction Id',
+  '1054':'MSISDN Limit Exceeded',
+  '1429':'Too Many Request. Try in a minute.'
+};
+let dlrData={mno:{},iptsp:{}};
 
-function parseDLR(file){
+function showDlrSub(which,el){
+  document.getElementById('dlrsub-mno').style.display   = which==='mno'?'block':'none';
+  document.getElementById('dlrsub-iptsp').style.display = which==='iptsp'?'block':'none';
+  document.getElementById('dlrsub-mno-btn').className   = which==='mno'?'seg-btn seg-btn--active':'seg-btn';
+  document.getElementById('dlrsub-iptsp-btn').className = which==='iptsp'?'seg-btn seg-btn--active':'seg-btn';
+}
+
+function parseDLR(file,which){
   if(!file) return;
   const reader=new FileReader();
   reader.onload=e=>{
     const rows=parseCSV(e.target.result);
-    const statusEl=document.getElementById('status-dlr');
+    const statusEl=document.getElementById(`status-dlr${which}`);
     const sample=rows[0]||{};
     const bodyKey=findKey(sample,['message_body','messageBody','body','message_Body']);
     if(!bodyKey){ statusEl.textContent='⚠ message_body column not found'; statusEl.className='upload-status error'; return; }
-    dlrData={};
+    dlrData[which]={};
     rows.forEach(r=>{
       const body=r[bodyKey]||'';
       const match=body.match(/statusCode=(\d+)/);
-      if(match){ const code=match[1]; dlrData[code]=(dlrData[code]||0)+1; }
+      if(match){ const code=match[1]; dlrData[which][code]=(dlrData[which][code]||0)+1; }
     });
-    renderDLRCounts();
+    renderDLRCounts(which);
     applyDateRange('dlr',extractDateRange(rows));
     statusEl.textContent=`✓ ${rows.length.toLocaleString()} rows parsed`;
     statusEl.className='upload-status';
-    document.getElementById('zone-dlr').classList.add('loaded');
+    document.getElementById(`zone-dlr${which}`).classList.add('loaded');
   };
   reader.readAsText(file);
 }
 
-function renderDLRCounts(){
-  const countsBox=document.getElementById('dlr-counts-box');
-  const manualBox=document.getElementById('dlr-manual-box');
-  const allCodes=Object.keys(dlrData).sort();
+function renderDLRCounts(which){
+  const countsBox=document.getElementById(`dlr-counts-box-${which}`);
+  const manualBox=document.getElementById(`dlr-manual-box-${which}`);
+  const allCodes=Object.keys(dlrData[which]).sort();
   countsBox.innerHTML=allCodes.map(code=>`
     <div class="dlr-card">
       <div class="dlr-code">statusCode=${code}</div>
-      <div class="dlr-count">${dlrData[code]}</div>
+      <div class="dlr-count">${dlrData[which][code]}</div>
       <div class="dlr-label">${DLR_KNOWN[code]||'Unknown'}</div>
     </div>`).join('');
   manualBox.innerHTML=`
@@ -803,40 +839,41 @@ function renderDLRCounts(){
       ${allCodes.map(code=>`
         <div class="field-block">
           <label>${code}</label>
-          <input class="field-input" type="number" id="dlr-m-${code}" value="${dlrData[code]}" min="0" oninput="updateDLRManual('${code}')">
+          <input class="field-input" type="number" id="dlr-m-${which}-${code}" value="${dlrData[which][code]}" min="0" oninput="updateDLRManual('${which}','${code}')">
         </div>`).join('')}
     </div>`;
 }
 
-function updateDLRManual(code){
-  const v=parseInt(document.getElementById(`dlr-m-${code}`).value)||0;
-  dlrData[code]=v;
-  const countsBox=document.getElementById('dlr-counts-box');
-  const allCodes=Object.keys(dlrData).sort();
+function updateDLRManual(which,code){
+  const v=parseInt(document.getElementById(`dlr-m-${which}-${code}`).value)||0;
+  dlrData[which][code]=v;
+  const countsBox=document.getElementById(`dlr-counts-box-${which}`);
+  const allCodes=Object.keys(dlrData[which]).sort();
   const countEls=countsBox.querySelectorAll('.dlr-count');
   const idx=allCodes.indexOf(code);
   if(countEls[idx]) countEls[idx].textContent=v;
 }
 
-function buildDLRScreenshot(){
+function buildDLRScreenshot(which){
   const fromDate=document.getElementById('dlr-from-date').value;
   const fromTime=document.getElementById('dlr-from-time').value;
   const toDate=document.getElementById('dlr-to-date').value;
   const toTime=document.getElementById('dlr-to-time').value;
-  const reporter=document.getElementById('dlr-reporter').value||'—';
-  const status=statusMap['dlr']||'Normal';
-  const issue=document.getElementById('dlr-issue').value.trim();
+  const prefix=`dlr${which}`;
+  const reporter=document.getElementById(`${prefix}-reporter`).value||'—';
+  const status=statusMap[prefix]||'Normal';
+  const issue=document.getElementById(`${prefix}-issue`).value.trim();
   const statusStr=status==='Normal'?'Normal':(issue||'—');
   const period=`${fmtDT(fromDate,fromTime)} - ${fmtDT(toDate,toTime)}`;
   const statusCls=status==='Normal'?'sc-status-normal':'sc-status-issue';
-  const allCodes=Object.keys(dlrData).sort();
+  const allCodes=Object.keys(dlrData[which]).sort();
   const rows=allCodes.length>0
-    ?allCodes.map(code=>`<tr><td>${code}</td><td style="text-align:left;">${DLR_KNOWN[code]||'—'}</td><td>${dlrData[code]||''}</td></tr>`).join('')
+    ?allCodes.map(code=>`<tr><td>${code}</td><td style="text-align:left;">${DLR_KNOWN[code]||'—'}</td><td>${dlrData[which][code]||''}</td></tr>`).join('')
     :`<tr><td colspan="3" style="text-align:center;color:#CCC;">No data</td></tr>`;
 
-  document.getElementById('sc-dlr').innerHTML=`
+  document.getElementById(`sc-${prefix}`).innerHTML=`
     <div class="sc-eyebrow">Infozillion Teletech BD · Service Assurance</div>
-    <div class="sc-title">DLR Report</div>
+    <div class="sc-title">DLR Report — ${which.toUpperCase()}</div>
     <div class="sc-time">${esc(period)}</div>
     <table class="sc-table" style="margin-bottom:16px;">
       <thead><tr>
@@ -851,26 +888,28 @@ function buildDLRScreenshot(){
       <div class="sc-meta-line"><strong>Status &nbsp;:</strong> <span class="${statusCls}">${esc(statusStr)}</span></div>
     </div>`;
 
-  const wrap=document.getElementById('ss-dlr');
+  const wrap=document.getElementById(`ss-${prefix}`);
   wrap.classList.add('show');
   setTimeout(()=>wrap.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
 }
 
-function copyDLRText(btn){
+function copyDLRText(which,btn){
   const fromDate=document.getElementById('dlr-from-date').value;
   const fromTime=document.getElementById('dlr-from-time').value;
   const toDate=document.getElementById('dlr-to-date').value;
   const toTime=document.getElementById('dlr-to-time').value;
-  const reporter=document.getElementById('dlr-reporter').value||'—';
-  const status=statusMap['dlr']||'Normal';
-  const issue=document.getElementById('dlr-issue').value.trim();
+  const prefix=`dlr${which}`;
+  const reporter=document.getElementById(`${prefix}-reporter`).value||'—';
+  const status=statusMap[prefix]||'Normal';
+  const issue=document.getElementById(`${prefix}-issue`).value.trim();
   const statusStr=status==='Normal'?'Normal':(issue||'—');
   const period=`${fmtDT(fromDate,fromTime)} - ${fmtDT(toDate,toTime)}`;
-  const text=`DLR,\n${period}\n\nReporter: ${reporter}\nStatus  : ${statusStr}`;
+  const text=`DLR — ${which.toUpperCase()},\n${period}\n\nReporter: ${reporter}\nStatus  : ${statusStr}`;
   navigator.clipboard.writeText(text).then(()=>{
     const orig=btn.textContent; btn.textContent='Copied ✓';
+    showToast('Copied — paste into WhatsApp');
     setTimeout(()=>btn.textContent=orig,2000);
-  });
+  }).catch(()=>showToast('Copy failed — try again'));
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -880,86 +919,92 @@ const DELAY_THRESHOLD=1;
 const OP_ORDER=['GrameenPhone','Robi','Banglalink','Teletalk'];
 const OP_CLASS={GrameenPhone:'gp',Robi:'robi',Banglalink:'bl',Teletalk:'tt'};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-let delayState={data:null,timeRange:{min:null,max:null}};
+let delayState={mno:{data:null,timeRange:{min:null,max:null}},iptsp:{data:null,timeRange:{min:null,max:null}}};
 
-function initDelay(){
-  const dropZone=document.getElementById('delay-dropZone');
-  const fileInput=document.getElementById('delay-fileInput');
-  const browseBtn=document.getElementById('delay-browseBtn');
-
-  browseBtn.addEventListener('click',e=>{e.stopPropagation();fileInput.click();});
-  dropZone.addEventListener('click',e=>{if(e.target.closest('button'))return;fileInput.click();});
-  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
-  dropZone.addEventListener('dragleave',e=>{if(!dropZone.contains(e.relatedTarget))dropZone.classList.remove('drag-over');});
-  dropZone.addEventListener('drop',e=>{
-    e.preventDefault();dropZone.classList.remove('drag-over');
-    const file=e.dataTransfer.files[0];if(file)handleDelayFile(file);
-  });
-  fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleDelayFile(fileInput.files[0]);fileInput.value='';});
-  document.getElementById('delay-resetBtn').addEventListener('click',resetDelay);
-  document.getElementById('delay-generateBtn').addEventListener('click',generateDelayCard);
-  document.getElementById('delay-copyImgBtn').addEventListener('click',()=>captureDelayCard(false));
-  document.getElementById('delay-downloadImgBtn').addEventListener('click',()=>captureDelayCard(true));
-  document.getElementById('delay-fStatus').addEventListener('change',function(){
-    document.getElementById('delay-fIssueGroup').style.display=this.value==='Issue'?'flex':'none';
-  });
-  document.getElementById('delay-copyTableBtn').addEventListener('click',()=>{
-    if(delayState.data)copyDelayTable(delayState.data);
-  });
-  document.getElementById('delay-exportCsvBtn').addEventListener('click',()=>{
-    if(delayState.data)exportDelayCSV(delayState.data);
-  });
-  initDelayDatetimes();
+function showDelaySub(which,el){
+  document.getElementById('delaysub-mno').style.display   = which==='mno'?'block':'none';
+  document.getElementById('delaysub-iptsp').style.display = which==='iptsp'?'block':'none';
+  document.getElementById('delaysub-mno-btn').className   = which==='mno'?'seg-btn seg-btn--active':'seg-btn';
+  document.getElementById('delaysub-iptsp-btn').className = which==='iptsp'?'seg-btn seg-btn--active':'seg-btn';
 }
 
-function initDelayDatetimes(){
+function initDelay(){
+  ['mno','iptsp'].forEach(which=>initDelayFor(which));
+}
+
+function initDelayFor(which){
+  document.getElementById(`delay-resetBtn-${which}`).addEventListener('click',()=>resetDelay(which));
+  document.getElementById(`delay-generateBtn-${which}`).addEventListener('click',()=>generateDelayCard(which));
+  document.getElementById(`delay-copyImgBtn-${which}`).addEventListener('click',()=>captureDelayCard(which,false));
+  document.getElementById(`delay-downloadImgBtn-${which}`).addEventListener('click',()=>captureDelayCard(which,true));
+  document.getElementById(`delay-fStatus-${which}`).addEventListener('change',function(){
+    document.getElementById(`delay-fIssueGroup-${which}`).style.display=this.value==='Issue'?'flex':'none';
+  });
+  document.getElementById(`delay-copyTableBtn-${which}`).addEventListener('click',()=>{
+    if(delayState[which].data)copyDelayTable(delayState[which].data);
+  });
+  document.getElementById(`delay-exportCsvBtn-${which}`).addEventListener('click',()=>{
+    if(delayState[which].data)exportDelayCSV(delayState[which].data,which);
+  });
+  initDelayDatetimes(which);
+}
+
+function initDelayDatetimes(which){
   const n=new Date();
   const from=new Date(n);from.setHours(from.getHours()-2);
-  document.getElementById('delay-fFrom').value=toDatetimeLocal(from);
-  document.getElementById('delay-fTo').value=toDatetimeLocal(n);
+  document.getElementById(`delay-fFrom-${which}`).value=toDatetimeLocal(from);
+  document.getElementById(`delay-fTo-${which}`).value=toDatetimeLocal(n);
 }
 
 function toDatetimeLocal(d){
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function showDelayScreen(which){
-  document.getElementById('delay-screen-upload').style.display=which==='upload'?'block':'none';
-  document.getElementById('delay-screen-loading').style.display=which==='loading'?'block':'none';
-  const res=document.getElementById('delay-results');
-  if(which==='results'){res.classList.add('show');}else{res.classList.remove('show');}
+function showDelayScreen(which,screen){
+  document.getElementById(`delay-screen-upload-${which}`).style.display=screen==='upload'?'block':'none';
+  document.getElementById(`delay-screen-loading-${which}`).style.display=screen==='loading'?'block':'none';
+  const res=document.getElementById(`delay-results-${which}`);
+  if(screen==='results'){res.classList.add('show');}else{res.classList.remove('show');}
 }
 
-function setDelayLoading(label,pct){
-  document.getElementById('delay-loadingLabel').textContent=label;
-  document.getElementById('delay-loadingFill').style.width=Math.min(pct,100)+'%';
+function setDelayLoading(which,label,pct){
+  document.getElementById(`delay-loadingLabel-${which}`).textContent=label;
+  document.getElementById(`delay-loadingFill-${which}`).style.width=Math.min(pct,100)+'%';
 }
 
-function handleDelayFile(file){
+function handleDelayFile(which,file){
   if(!file.name.toLowerCase().endsWith('.csv')){showToast('Please select a .csv file');return;}
-  showDelayScreen('loading');setDelayLoading('Reading file…',10);
+  const zone=document.getElementById(`zone-delay${which}`);
+  const statusEl=document.getElementById(`status-delay${which}`);
+  showDelayScreen(which,'loading');setDelayLoading(which,'Reading file…',10);
   const reader=new FileReader();
-  reader.onprogress=e=>{if(e.lengthComputable)setDelayLoading('Reading file…',(e.loaded/e.total)*40);};
+  reader.onprogress=e=>{if(e.lengthComputable)setDelayLoading(which,'Reading file…',(e.loaded/e.total)*40);};
   reader.onload=e=>{
     setTimeout(()=>{
       try{
-        setDelayLoading('Parsing CSV…',50);
+        setDelayLoading(which,'Parsing CSV…',50);
         const rows=parseDelayCSV(e.target.result);
-        setDelayLoading(`Computing delays for ${rows.length.toLocaleString()} rows…`,70);
+        setDelayLoading(which,`Computing delays for ${rows.length.toLocaleString()} rows…`,70);
         setTimeout(()=>{
           const data=computeDelayData(rows);
-          delayState.data=data;
-          setDelayLoading('Rendering report…',90);
+          delayState[which].data=data;
+          setDelayLoading(which,'Rendering report…',90);
           setTimeout(()=>{
-            renderDelayResults(data,file.name,rows.length);
-            setDelayLoading('Done',100);
-            setTimeout(()=>showDelayScreen('results'),150);
+            renderDelayResults(which,data,file.name,rows.length);
+            setDelayLoading(which,'Done',100);
+            if(statusEl){statusEl.textContent=`✓ ${rows.length.toLocaleString()} rows parsed`;statusEl.className='upload-status';}
+            if(zone)zone.classList.add('loaded');
+            setTimeout(()=>showDelayScreen(which,'results'),150);
           },80);
         },40);
-      }catch(err){showDelayScreen('upload');showToast('Error: '+err.message);}
+      }catch(err){
+        showDelayScreen(which,'upload');
+        if(statusEl){statusEl.textContent='⚠ '+err.message;statusEl.className='upload-status error';}
+        showToast('Error: '+err.message);
+      }
     },30);
   };
-  reader.onerror=()=>{showDelayScreen('upload');showToast('Could not read file');};
+  reader.onerror=()=>{showDelayScreen(which,'upload');showToast('Could not read file');};
   reader.readAsText(file,'UTF-8');
 }
 
@@ -1028,27 +1073,27 @@ function computeDelayData(rows){
   return{pivot,opArr,opTotals,delayTotals,delayKeys,grand,tsMin,tsMax};
 }
 
-function renderDelayResults(data,fileName,rowCount){
+function renderDelayResults(which,data,fileName,rowCount){
   const{pivot,opArr,opTotals,delayTotals,delayKeys,grand,tsMin,tsMax}=data;
 
-  document.getElementById('delay-resultsMeta').textContent=`${fileName} · ${rowCount.toLocaleString()} rows · ${grand.toLocaleString()} computed`;
+  document.getElementById(`delay-resultsMeta-${which}`).textContent=`${fileName} · ${rowCount.toLocaleString()} rows · ${grand.toLocaleString()} computed`;
 
-  const tr=document.getElementById('delay-timeRange');
+  const tr=document.getElementById(`delay-timeRange-${which}`);
   if(tsMin&&tsMax){
     tr.innerHTML=`<span><strong>From</strong> ${formatDT(tsMin)}</span><span><strong>To</strong> ${formatDT(tsMax)}</span><span><strong>Duration</strong> ${formatDuration(tsMax-tsMin)}</span>`;
-    document.getElementById('delay-fFrom').value=toDatetimeLocal(tsMin);
-    document.getElementById('delay-fTo').value=toDatetimeLocal(tsMax);
-    document.getElementById('delay-fromHint').textContent='from CSV';
-    document.getElementById('delay-toHint').textContent='from CSV';
-    delayState.timeRange={min:tsMin,max:tsMax};
+    document.getElementById(`delay-fFrom-${which}`).value=toDatetimeLocal(tsMin);
+    document.getElementById(`delay-fTo-${which}`).value=toDatetimeLocal(tsMax);
+    document.getElementById(`delay-fromHint-${which}`).textContent='from CSV';
+    document.getElementById(`delay-toHint-${which}`).textContent='from CSV';
+    delayState[which].timeRange={min:tsMin,max:tsMax};
   } else {
     tr.innerHTML=`<span><strong>Time range</strong> not detected — enter manually below</span>`;
   }
 
   // Pivot table
-  const thead=document.querySelector('#delay-pivotTable thead');
-  const tbody=document.querySelector('#delay-pivotTable tbody');
-  const tfoot=document.querySelector('#delay-pivotTable tfoot');
+  const thead=document.querySelector(`#delay-pivotTable-${which} thead`);
+  const tbody=document.querySelector(`#delay-pivotTable-${which} tbody`);
+  const tfoot=document.querySelector(`#delay-pivotTable-${which} tfoot`);
   thead.innerHTML=`<tr><th>Time to get response (s)</th>${opArr.map(op=>`<th>${op}</th>`).join('')}<th>Total</th></tr>`;
   tbody.innerHTML=delayKeys.map(d=>{
     const isDelayed=d>=DELAY_THRESHOLD;
@@ -1061,7 +1106,7 @@ function renderDelayResults(data,fileName,rowCount){
 
   // Op cards
   const DELAY_PCT_THRESHOLD=30;
-  const cards=document.getElementById('delay-opCards');
+  const cards=document.getElementById(`delay-opCards-${which}`);
   const withTotal=[...opArr,null];
   cards.innerHTML=withTotal.map(op=>{
     if(op===null){
@@ -1094,15 +1139,15 @@ function formatDT(d){const p=n=>String(n).padStart(2,'0');return `${d.getFullYea
 function formatDuration(ms){const s=Math.round(ms/1000),m=Math.floor(s/60),h=Math.floor(m/60);if(h>0)return`${h}h ${m%60}m`;if(m>0)return`${m}m ${s%60}s`;return`${s}s`;}
 function formatCardDT(d){const p=(n,l=2)=>String(n).padStart(l,'0');return `${MONTHS[d.getMonth()]} ${p(d.getDate())}, ${d.getFullYear()} @ ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.000`;}
 
-function generateDelayCard(){
-  if(!delayState.data){showToast('No data loaded');return;}
-  const{pivot,opArr,opTotals,delayTotals,delayKeys,grand}=delayState.data;
-  const reportType=document.getElementById('delay-fReportType').value||'Delay Report';
-  const reporter=document.getElementById('delay-fReporter').value||'—';
-  const status=document.getElementById('delay-fStatus').value;
-  const issueText=document.getElementById('delay-fIssue').value.trim();
-  const fromVal=document.getElementById('delay-fFrom').value;
-  const toVal=document.getElementById('delay-fTo').value;
+function generateDelayCard(which){
+  if(!delayState[which].data){showToast('No data loaded');return;}
+  const{pivot,opArr,opTotals,delayTotals,delayKeys,grand}=delayState[which].data;
+  const reportType=document.getElementById(`delay-fReportType-${which}`).value||'Delay Report';
+  const reporter=document.getElementById(`delay-fReporter-${which}`).value||'—';
+  const status=document.getElementById(`delay-fStatus-${which}`).value;
+  const issueText=document.getElementById(`delay-fIssue-${which}`).value.trim();
+  const fromVal=document.getElementById(`delay-fFrom-${which}`).value;
+  const toVal=document.getElementById(`delay-fTo-${which}`).value;
   const fromStr=fromVal?formatCardDT(new Date(fromVal)):'—';
   const toStr=toVal?formatCardDT(new Date(toVal)):'—';
   const DELAY_PCT_THRESHOLD=30;
@@ -1148,7 +1193,7 @@ function generateDelayCard(){
     ?`<span class="rc-status-normal">Normal</span>`
     :`<span class="rc-status-issue">Issue</span>${issueText?` — <span class="rc-issue-text">${esc(issueText)}</span>`:''}`;
 
-  document.getElementById('delay-reportCard').innerHTML=`
+  document.getElementById(`delay-reportCard-${which}`).innerHTML=`
     <div class="rc-eyebrow">Infozillion Teletech BD · Service Assurance</div>
     <div class="rc-title">${esc(reportType)}</div>
     <div class="rc-time">${esc(fromStr)} &mdash; ${esc(toStr)}</div>
@@ -1165,13 +1210,13 @@ function generateDelayCard(){
       <div class="rc-meta-line"><strong>Status:</strong> ${statusHTML}</div>
     </div>`;
 
-  const preview=document.getElementById('delay-cardPreview');
+  const preview=document.getElementById(`delay-cardPreview-${which}`);
   preview.style.display='block';
   setTimeout(()=>preview.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
 
-async function captureDelayCard(download){
-  const card=document.getElementById('delay-reportCard');
+async function captureDelayCard(which,download){
+  const card=document.getElementById(`delay-reportCard-${which}`);
   if(!card.innerHTML.trim()){showToast('Generate a card first');return;}
   showToast('Generating image…');
   const fullW=card.scrollWidth,fullH=card.scrollHeight;
@@ -1187,7 +1232,7 @@ async function captureDelayCard(download){
     restore();
     if(download){
       const a=document.createElement('a');a.href=canvas.toDataURL('image/png');
-      a.download=`delay_report_${formatFileDate(new Date())}.png`;a.click();
+      a.download=`delay_report_${which}_${formatFileDate(new Date())}.png`;a.click();
       showToast('Downloaded ✓');
     } else {
       canvas.toBlob(async blob=>{
@@ -1205,23 +1250,27 @@ function copyDelayTable({pivot,delayKeys,opArr,opTotals,delayTotals,grand}){
   navigator.clipboard.writeText(rows.join('\n')).then(()=>showToast('Table copied — paste into Excel')).catch(()=>showToast('Copy failed'));
 }
 
-function exportDelayCSV({pivot,delayKeys,opArr,opTotals,delayTotals,grand}){
+function exportDelayCSV({pivot,delayKeys,opArr,opTotals,delayTotals,grand},which){
   const rows=[['Time to get response (s)',...opArr,'Grand Total'].join(',')];
   for(const d of delayKeys){const cells=[d];for(const op of opArr)cells.push(pivot[d][op]||0);cells.push(delayTotals[d]||0);rows.push(cells.join(','));}
   const ft=['Grand Total'];for(const op of opArr)ft.push(opTotals[op]||0);ft.push(grand);rows.push(ft.join(','));
   const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`delay_report_${formatFileDate(new Date())}.csv`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`delay_report_${which||'mno'}_${formatFileDate(new Date())}.csv`;a.click();
   showToast('CSV exported');
 }
 
-function resetDelay(){
-  delayState={data:null,timeRange:{min:null,max:null}};
-  document.getElementById('delay-cardPreview').style.display='none';
-  document.getElementById('delay-reportCard').innerHTML='';
-  initDelayDatetimes();
-  document.getElementById('delay-fromHint').textContent='auto from CSV';
-  document.getElementById('delay-toHint').textContent='auto from CSV';
-  showDelayScreen('upload');
+function resetDelay(which){
+  if(!which){ ['mno','iptsp'].forEach(w=>resetDelay(w)); return; }
+  delayState[which]={data:null,timeRange:{min:null,max:null}};
+  document.getElementById(`delay-cardPreview-${which}`).style.display='none';
+  document.getElementById(`delay-reportCard-${which}`).innerHTML='';
+  initDelayDatetimes(which);
+  document.getElementById(`delay-fromHint-${which}`).textContent='auto from CSV';
+  document.getElementById(`delay-toHint-${which}`).textContent='auto from CSV';
+  const zone=document.getElementById(`zone-delay${which}`);if(zone)zone.classList.remove('loaded');
+  const status=document.getElementById(`status-delay${which}`);if(status){status.textContent='';status.className='upload-status';}
+  const rep=document.getElementById(`delay-fReporter-${which}`);if(rep)rep.value='Rizvi';
+  showDelayScreen(which,'upload');
 }
 
 // Delay report card styles (inline for report card)
@@ -1367,18 +1416,20 @@ function resetAll(btn){
   const httpStatus=document.getElementById('status-http');if(httpStatus){httpStatus.textContent='';httpStatus.className='upload-status';}
   document.getElementById('http-output').style.display='none';
   // DLR
-  dlrData={};
-  document.getElementById('zone-dlr').classList.remove('loaded');
-  const dlrStatus=document.getElementById('status-dlr');if(dlrStatus){dlrStatus.textContent='';dlrStatus.className='upload-status';}
-  document.getElementById('dlr-counts-box').innerHTML='';
-  document.getElementById('dlr-manual-box').innerHTML='';
-  document.getElementById('ss-dlr').classList.remove('show');
+  dlrData={mno:{},iptsp:{}};
+  ['mno','iptsp'].forEach(w=>{
+    const z=document.getElementById(`zone-dlr${w}`);if(z)z.classList.remove('loaded');
+    const s=document.getElementById(`status-dlr${w}`);if(s){s.textContent='';s.className='upload-status';}
+    const cb=document.getElementById(`dlr-counts-box-${w}`);if(cb)cb.innerHTML='';
+    const mb=document.getElementById(`dlr-manual-box-${w}`);if(mb)mb.innerHTML='';
+    const ss=document.getElementById(`ss-dlr${w}`);if(ss)ss.classList.remove('show');
+  });
   // Delay
   resetDelay();
   // Datetimes
   ['9xxx','1xxx','http','dlr'].forEach(p=>initDT(p));
   // Statuses
-  ['9mno','9iptsp','1mno','1iptsp','http','dlr'].forEach(p=>{
+  ['9mno','9iptsp','1mno','1iptsp','http','dlrmno','dlriptsp'].forEach(p=>{
     statusMap[p]='Normal';
     const bn=document.getElementById(`${p}-btn-n`);if(bn)bn.className='st-btn normal-on';
     const bi=document.getElementById(`${p}-btn-i`);if(bi)bi.className='st-btn';
@@ -1390,8 +1441,10 @@ function resetAll(btn){
   // Backup
   const list=document.getElementById('save-file-list');if(list)list.innerHTML='';
 
-  const orig=btn.textContent;btn.textContent='Done ✓';
-  setTimeout(()=>{btn.textContent=orig;},2000);
+  if(btn){
+    const orig=btn.textContent;btn.textContent='Done ✓';
+    setTimeout(()=>{btn.textContent=orig;},2000);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1403,7 +1456,92 @@ document.addEventListener('DOMContentLoaded',()=>{
   refreshHTTP();
   initDelay();
   initUploadZoneDragDrop();
+  initAllReporterAutocompletes();
 });
+
+/* ── Reporter name autocomplete ──────────────────────────────────── */
+const REPORTER_NAMES=['Rizvi','Najmaz Sakib','Apu','Nayeem','Ferdous','Moshaid','Nazmul','Borhan','Shuvo','Imtiaj','Rahim','Mamun'];
+
+function initReporterAutocomplete(inputId){
+  const input=document.getElementById(inputId);
+  if(!input) return;
+
+  let wrap=input.parentElement;
+  if(!wrap.classList.contains('autocomplete-wrap')){
+    wrap=document.createElement('div');
+    wrap.className='autocomplete-wrap';
+    input.parentNode.insertBefore(wrap,input);
+    wrap.appendChild(input);
+  }
+  const list=document.createElement('div');
+  list.className='autocomplete-list';
+  wrap.appendChild(list);
+
+  let activeIdx=-1;
+
+  function renderList(matches){
+    activeIdx=-1;
+    list.innerHTML=matches.map(n=>`<div class="autocomplete-item" data-name="${esc(n)}">${esc(n)}</div>`).join('');
+    list.style.display=matches.length?'block':'none';
+  }
+
+  input.addEventListener('input',()=>{
+    const v=input.value.trim().toLowerCase();
+    if(!v){ list.style.display='none'; return; }
+    renderList(REPORTER_NAMES.filter(n=>n.toLowerCase().includes(v)));
+  });
+
+  input.addEventListener('focus',()=>{
+    if(input.value.trim()) renderList(REPORTER_NAMES.filter(n=>n.toLowerCase().includes(input.value.trim().toLowerCase())));
+  });
+
+  input.addEventListener('keydown',e=>{
+    const items=[...list.querySelectorAll('.autocomplete-item')];
+    if(!items.length || list.style.display==='none') return;
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      activeIdx=Math.min(activeIdx+1,items.length-1);
+      items.forEach((it,i)=>it.classList.toggle('active',i===activeIdx));
+      items[activeIdx].scrollIntoView({block:'nearest'});
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      activeIdx=Math.max(activeIdx-1,0);
+      items.forEach((it,i)=>it.classList.toggle('active',i===activeIdx));
+      items[activeIdx].scrollIntoView({block:'nearest'});
+    } else if(e.key==='Enter'){
+      if(activeIdx>=0 && items[activeIdx]){
+        e.preventDefault();
+        input.value=items[activeIdx].dataset.name;
+        list.style.display='none';
+      } else if(items.length===1){
+        e.preventDefault();
+        input.value=items[0].dataset.name;
+        list.style.display='none';
+      }
+    } else if(e.key==='Escape'){
+      list.style.display='none';
+    }
+  });
+
+  list.addEventListener('mousedown',e=>{
+    const item=e.target.closest('.autocomplete-item');
+    if(item){ input.value=item.dataset.name; list.style.display='none'; }
+  });
+
+  input.addEventListener('blur',()=>{
+    setTimeout(()=>{ list.style.display='none'; },150);
+  });
+}
+
+function initAllReporterAutocompletes(){
+  [
+    '9mno-reporter','9iptsp-reporter',
+    '1mno-reporter','1iptsp-reporter',
+    'http-reporter',
+    'dlrmno-reporter','dlriptsp-reporter',
+    'delay-fReporter-mno','delay-fReporter-iptsp'
+  ].forEach(initReporterAutocomplete);
+}
 
 /* ── Generic drag-and-drop for all .upload-zone boxes (9xxx, 1xxx, 4xx/5xx HTTP, DLR) ── */
 function initUploadZoneDragDrop() {
@@ -1414,7 +1552,10 @@ function initUploadZoneDragDrop() {
     'zone-1mno':   file => parse1xxx(file, 'mno'),
     'zone-1iptsp': file => parse1xxx(file, 'iptsp'),
     'zone-http':   file => parseHTTPcsv(file),
-    'zone-dlr':    file => parseDLR(file),
+    'zone-dlrmno':    file => parseDLR(file, 'mno'),
+    'zone-dlriptsp':  file => parseDLR(file, 'iptsp'),
+    'zone-delaymno':   file => handleDelayFile('mno', file),
+    'zone-delayiptsp': file => handleDelayFile('iptsp', file),
   };
 
   document.querySelectorAll('.upload-zone').forEach(zone => {
@@ -1446,27 +1587,3 @@ function initUploadZoneDragDrop() {
     });
   });
 }
-
-/* ── WA Preview Modal ─────────────────────────── */
-function showWaModal(text) {
-  const overlay = document.getElementById('wa-modal-overlay');
-  const pre = document.getElementById('wa-modal-content');
-  if (!overlay || !pre) return;
-  pre.textContent = text;
-  overlay.style.display = 'flex';
-}
-function closeWaModal() {
-  const o = document.getElementById('wa-modal-overlay');
-  if (o) o.style.display = 'none';
-}
-function copyFromModal() {
-  const pre = document.getElementById('wa-modal-content');
-  const btn = document.getElementById('wa-modal-copy-btn');
-  if (!pre) return;
-  navigator.clipboard.writeText(pre.textContent).then(() => {
-    if (btn) { btn.textContent = 'Copied ✓'; btn.style.background = '#1A6B3C'; }
-    setTimeout(() => { if(btn){btn.textContent='Copy to Clipboard';btn.style.background='#1A1916';} }, 2000);
-  });
-}
-document.addEventListener('click', e => { const o=document.getElementById('wa-modal-overlay'); if(e.target===o)closeWaModal(); });
-document.addEventListener('keydown', e => { if(e.key==='Escape')closeWaModal(); });

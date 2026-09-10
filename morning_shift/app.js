@@ -600,8 +600,8 @@ function generateAndCopy() {
   const previewBox     = document.getElementById('preview');
   previewBox.textContent = msg;
   previewSection.style.display = 'block';
-  previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   showWaModal(msg);
+  previewSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   navigator.clipboard.writeText(msg)
     .then(() => {
