@@ -1,0 +1,104 @@
+/* ═══════════════════════════════════════════════════════════════
+   OpsHub shared tool theme — v5.0.0
+   Every tool page matches the hub Dashboard: Inter, indigo accent,
+   white rounded cards, soft borders, 8px inputs and buttons.
+   Report cards / screenshots that get exported or shared are pinned
+   to their original look so the outputs do not change.
+   ═══════════════════════════════════════════════════════════════ */
+html.hub-theme{
+  --hub-font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --hub-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace;
+  --hub-shadow:0 1px 2px rgba(20,28,60,.04),0 2px 8px rgba(20,28,60,.04);
+  --hub-shadow-md:0 4px 14px rgba(20,28,60,.08);
+  --hub-indigo:#5B4FD9; --hub-indigo-dark:#4C41C2; --hub-indigo-soft:#EEEDFE; --hub-indigo-bdr:#C9C4F5;
+}
+html.hub-theme body{font-family:var(--hub-font)!important;background:#F7F8FC;color:#1B2133;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+html.hub-theme input,html.hub-theme select,html.hub-theme textarea,html.hub-theme button{font-family:var(--hub-font)}
+html.hub-theme input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]):not([type=range]):not([type=button]):not([type=submit]),
+html.hub-theme select,html.hub-theme textarea{
+  background:#fff;color:#1B2133;border:1px solid #D9DDEA;border-radius:8px;
+  transition:border-color .12s,box-shadow .12s}
+html.hub-theme input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]):not([type=range]):not([type=button]):not([type=submit]):focus,
+html.hub-theme select:focus,html.hub-theme textarea:focus{border-color:#B9C3F5;box-shadow:0 0 0 3px rgba(91,79,217,.10);outline:none}
+html.hub-theme input::placeholder,html.hub-theme textarea::placeholder{color:#A3AABF}
+html.hub-theme ::selection{background:#DCD9FB}
+html.hub-theme pre,html.hub-theme code,html.hub-theme samp,html.hub-theme textarea#raw,html.hub-theme textarea#inputArea,html.hub-theme .output-box{font-family:var(--hub-mono)}
+html.hub-theme .card{background:#fff;border:1px solid #E8EBF3;border-radius:14px;box-shadow:var(--hub-shadow)}
+html.hub-theme .btn{font-family:var(--hub-font);font-weight:500;font-size:12.5px;border-radius:8px;letter-spacing:0}
+
+
+/* ── daily_report ── */
+html.hub-theme.tool-daily{--bg:#F7F8FC;--surface:#FFFFFF;--surface-2:#F6F7FB;--border:#E8EBF3;--border-strong:#D9DDEA;--text-primary:#1B2133;--text-secondary:#4A5168;--text-tertiary:#8089A1;--accent:#5B4FD9;--accent-light:#4C41C2;--ok:#15803D;--ok-bg:#E7F6EC;--warn:#B45309;--warn-bg:#FEF3DC;--danger:#DC2626;--font-sans:var(--hub-font);--font-mono:var(--hub-font);--font-display:var(--hub-font);--shadow-sm:var(--hub-shadow);--shadow-md:var(--hub-shadow-md)}
+
+html.tool-daily .section-head h2{font-family:var(--hub-font)!important;font-size:1.4rem;font-weight:700;letter-spacing:-.02em;color:#1B2133}
+html.tool-daily .section-head h2 em{font-style:normal;color:var(--hub-indigo)}
+html.tool-daily .section-badge{font-family:var(--hub-font);background:#EEEDFE;color:#5B4FD9;border:0;border-radius:20px;font-weight:600}
+html.tool-daily .tab-nav{background:#fff;border-bottom:1px solid #E8EBF3}
+html.tool-daily .tab-btn{font-family:var(--hub-font);font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;color:#4A5168}
+html.tool-daily .tab-btn:hover{color:#1B2133}
+html.tool-daily .tab-btn.active{color:#5B4FD9;border-bottom-color:#5B4FD9}
+html.tool-daily .card-header{background:#fff;border-bottom:1px solid #F1F3F8}
+html.tool-daily .card-title{font-family:var(--hub-font);font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;color:#1B2133}
+html.tool-daily .seg-control{background:#F1F3F9;border:1px solid #E8EBF3;border-radius:10px}
+html.tool-daily .seg-btn{font-family:var(--hub-font);font-weight:500;border-radius:8px}
+html.tool-daily .seg-btn.seg-btn--active{background:#fff;color:#5B4FD9;box-shadow:var(--hub-shadow)}
+
+
+/* ── morning_shift ── */
+html.hub-theme.tool-morning{--bg:#F7F8FC;--surface:#FFFFFF;--surface-2:#F6F7FB;--border:#E8EBF3;--border-strong:#D9DDEA;--text:#1B2133;--text-2:#4A5168;--text-3:#8089A1;--accent:#5B4FD9;--green:#15803D;--green-bg:#E7F6EC;--red:#DC2626;--red-bg:#FEECEC;--blue:#3B63E0;--blue-bg:#EAF0FE;--font-sans:var(--hub-font);--font-mono:var(--hub-font);--font-display:var(--hub-font);--shadow-sm:var(--hub-shadow);--shadow:var(--hub-shadow)}
+
+
+/* ── mnp_status ── */
+html.hub-theme.tool-mnp{--bg:#F7F8FC;--surface:#FFFFFF;--surface2:#F6F7FB;--surface3:#EEF0F7;--border:#E8EBF3;--border-md:#D9DDEA;--t1:#1B2133;--t2:#4A5168;--t3:#8089A1;--blue:#5B4FD9;--blue-lt:#EEEDFE;--blue-bdr:#C9C4F5;--blue-dark:#4C41C2;--warn:#B45309;--warn-lt:#FEF3DC;--crit:#DC2626;--crit-lt:#FEECEC;--sh:var(--hub-shadow);--sh-sm:var(--hub-shadow);--sh-lg:var(--hub-shadow-md);--font:var(--hub-font);--mono:var(--hub-font)}
+
+
+/* ── cp_mno_json ── */
+html.hub-theme.tool-cp{--bg:#F7F8FC;--surface:#FFFFFF;--surface-2:#F6F7FB;--border:#E8EBF3;--border-md:#D9DDEA;--text:#1B2133;--text-2:#4A5168;--text-3:#8089A1;--accent:#5B4FD9;--accent-2:#4C41C2;--accent-bg:#EEEDFE;--accent-bdr:#C9C4F5;--accent-dim:rgba(91,79,217,.09);--ok:#15803D;--ok-bg:#E7F6EC;--err:#DC2626;--err-bg:#FEECEC;--font:var(--hub-font);--serif:var(--hub-font);--mono:var(--hub-font);--sh:var(--hub-shadow)}
+
+html.tool-cp body::before{display:none!important}
+html.tool-cp .card::before{display:none!important}
+html.tool-cp .btn-primary:hover{box-shadow:0 3px 10px rgba(91,79,217,.28)}
+
+
+/* ── ip_whitelist ── */
+html.hub-theme.tool-ip{--bg:#F7F8FC;--card:#FFFFFF;--ink:#1B2133;--ink-soft:#4A5168;--line:#E8EBF3;--accent:#5B4FD9;--accent-soft:#EEEDFE;--danger:#DC2626;--danger-soft:#FEECEC;--shadow:var(--hub-shadow)}
+
+
+/* ── support_resolver ── */
+html.hub-theme.tool-support{--bg:#F7F8FC;--panel:#FFFFFF;--panel-2:#F6F7FB;--line:#E8EBF3;--text:#1B2133;--muted:#8089A1;--accent:#5B4FD9;--accent-dim:#C9C4F5;--warn:#B45309;--err:#DC2626;--mono:var(--hub-font);--sans:var(--hub-font)}
+
+html.tool-support body{background:#F7F8FC!important}
+
+
+/* ── ans_traffic ── */
+html.hub-theme.tool-ans{--bg:#F7F8FC;--surface:#FFFFFF;--surface2:#F6F7FB;--border:#E8EBF3;--border2:#D9DDEA;--accent:#5B4FD9;--accent2:#3B63E0;--accent-dim:rgba(91,79,217,.09);--accent2-dim:rgba(59,99,224,.09);--err:#DC2626;--err-dim:#FEECEC;--text:#1B2133;--text2:#4A5168;--text3:#8089A1;--mono:var(--hub-font);--sans:var(--hub-font)}
+
+html.tool-ans body::before{display:none!important}
+html.tool-ans .process-btn:hover{background:#4C41C2;box-shadow:0 4px 12px rgba(91,79,217,.25)}
+html.tool-ans .count-input:focus{border-color:#B9C3F5;box-shadow:0 0 0 3px rgba(91,79,217,.10)}
+html.tool-ans .td-success,html.tool-ans .stat-value.success{color:#15803D}
+
+
+/* exported output stays exactly as before */
+html.tool-daily .screenshot-card,html.tool-daily .delay-report-card{--bg:#F5F4F0;--surface:#FFFFFF;--surface-2:#F0EFE9;--border:#E2E0D8;--border-strong:#C8C6BC;--text-primary:#1A1916;--text-secondary:#6B6860;--text-tertiary:#A8A69E;--accent:#1A1916;--accent-light:#2E2C28;--ok:#1A6B3C;--ok-bg:#EBF7F1;--warn:#B84E1A;--warn-bg:#FDF0E8;--danger:#C0392B;--font-sans:'DM Sans', sans-serif;--font-mono:'DM Mono', monospace;--font-display:'Instrument Serif', serif;--shadow-sm:0 1px 3px rgba(26,25,22,.06), 0 1px 2px rgba(26,25,22,.04);--shadow-md:0 4px 12px rgba(26,25,22,.08), 0 1px 4px rgba(26,25,22,.06);font-family:var(--font-sans)}
+
+/* exported output stays exactly as before */
+html.tool-ip #captureArea{--bg:#F5F4F0;--card:#FFFFFF;--ink:#1E1C19;--ink-soft:#6B665F;--line:#E4E0D8;--accent:#2F5D50;--accent-soft:#E6EEEA;--danger:#B5473A;--danger-soft:#FBEAE6;--shadow:0 1px 2px rgba(30,28,25,0.04), 0 8px 24px rgba(30,28,25,0.06);font-family:'DM Sans', sans-serif}
+
+/* ── standalone tool header (hidden automatically when the tool runs inside the hub) ── */
+html.hub-theme .unified-header{display:flex;align-items:center;gap:14px;background:#fff;padding:0 24px;height:56px;border-bottom:1px solid #E8EBF3;box-shadow:none}
+html.hub-theme .unified-header .uh-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+html.hub-theme .unified-header .uh-icon svg{width:17px;height:17px}
+html.hub-theme .unified-header .uh-info{flex:1;min-width:0}
+html.hub-theme .unified-header .uh-title{font-family:var(--hub-font);font-size:13.5px;font-weight:600;color:#1B2133;line-height:1.3}
+html.hub-theme .unified-header .uh-sub{font-family:var(--hub-font);font-size:11.5px;color:#8089A1;margin-top:1px}
+html.hub-theme .unified-header .uh-badge{font-family:var(--hub-font);font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:20px;margin-left:6px}
+html.hub-theme .unified-header .uh-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+html.hub-theme .unified-header .uh-btn{display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#fff;border:1px solid #D9DDEA;border-radius:8px;font-family:var(--hub-font);font-size:12.5px;font-weight:500;color:#1B2133;cursor:pointer}
+html.hub-theme .unified-header .uh-btn:hover{background:#F4F6FB}
+
+/* ── final per-tool touches ── */
+html.tool-morning .report-meta-title{font-weight:700;letter-spacing:-.02em}
+html.tool-morning .sec-title{font-weight:600}
+html.tool-mnp .btn-primary:hover{box-shadow:0 4px 14px rgba(91,79,217,.3)}
+html.tool-support .btn-ai{background:linear-gradient(135deg,#5B4FD9,#7C6BF0)!important;color:#fff}

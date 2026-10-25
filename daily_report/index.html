@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="hub-theme tool-daily">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,6 +34,11 @@
 .in-hub .tab-nav{ top:0!important; }
 .in-hub{ --topbar:0px!important; }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="stylesheet" href="../assets/theme.css">
 </head>
 <body>
 
@@ -60,6 +65,14 @@
   <button class="tab-btn" onclick="switchTab('delay',this)">Delay Report</button>
   <button class="tab-btn" onclick="switchTab('backup',this)">Drive Backup</button>
 </nav>
+
+<!-- GLOBAL PREPARED BY — fills all 9 reporter fields across tabs -->
+<div style="max-width:1100px;margin:0 auto;padding:10px 24px 0;">
+  <div style="display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:8px 14px;">
+    <label style="font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-tertiary);white-space:nowrap;">Prepared By <span style="font-weight:400;opacity:0.7;">(all reports)</span></label>
+    <input class="field-input" type="text" id="global-reporter" value="Rizvi" placeholder="Type a name — fills every report's Prepared By" style="flex:1;max-width:280px;">
+  </div>
+</div>
 
 <!-- ═══════════ 9XXX ═══════════ -->
 <div class="tab-panel active" id="panel-9xxx">
@@ -123,7 +136,7 @@
       <div class="card-header"><span class="card-title">Report Info — MNO</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="9mno-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="9mno-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="9mno-btn-n" onclick="setSt('9mno','Normal')">Normal</button>
@@ -157,7 +170,7 @@
       <div class="card-header"><span class="card-title">Report Info — IPTSP</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="9iptsp-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="9iptsp-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="9iptsp-btn-n" onclick="setSt('9iptsp','Normal')">Normal</button>
@@ -248,7 +261,7 @@
       <div class="card-header"><span class="card-title">Report Info — MNO</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="1mno-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="1mno-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="1mno-btn-n" onclick="setSt('1mno','Normal')">Normal</button>
@@ -282,7 +295,7 @@
       <div class="card-header"><span class="card-title">Report Info — IPTSP</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="1iptsp-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="1iptsp-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="1iptsp-btn-n" onclick="setSt('1iptsp','Normal')">Normal</button>
@@ -357,7 +370,7 @@
     <div class="card-header"><span class="card-title">Report Info</span></div>
     <div class="card-body">
       <div class="field-stack">
-        <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="http-reporter" placeholder="e.g. Name"></div>
+        <input type="hidden" id="http-reporter" value="Rizvi">
         <div class="field-block"><label>Status</label>
           <div class="status-row">
             <button class="st-btn normal-on" id="http-btn-n" onclick="setSt('http','Normal')">Normal</button>
@@ -450,7 +463,7 @@
       <div class="card-header"><span class="card-title">Report Info — MNO</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="dlrmno-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="dlrmno-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="dlrmno-btn-n" onclick="setSt('dlrmno','Normal')">Normal</button>
@@ -488,7 +501,7 @@
       <div class="card-header"><span class="card-title">Report Info — IPTSP</span></div>
       <div class="card-body">
         <div class="field-stack">
-          <div class="field-block"><label>Prepared By</label><input class="field-input" type="text" id="dlriptsp-reporter" placeholder="e.g. Name"></div>
+          <input type="hidden" id="dlriptsp-reporter" value="Rizvi">
           <div class="field-block"><label>Status</label>
             <div class="status-row">
               <button class="st-btn normal-on" id="dlriptsp-btn-n" onclick="setSt('dlriptsp','Normal')">Normal</button>
@@ -635,7 +648,7 @@
       <div class="card-body">
         <div class="field-grid">
           <div class="field-block"><label>Report Type</label><input class="field-input" type="text" id="delay-fReportType-mno" value="Delay Report — MNO" placeholder="e.g. Delay Report"></div>
-          <div class="field-block"><label>Reporter Name</label><input class="field-input" type="text" id="delay-fReporter-mno" placeholder="e.g. Rizvi"></div>
+          <input type="hidden" id="delay-fReporter-mno" value="Rizvi">
         </div>
         <div class="field-grid" style="margin-top:1rem;">
           <div class="field-block"><label>Status</label>
@@ -747,7 +760,7 @@
       <div class="card-body">
         <div class="field-grid">
           <div class="field-block"><label>Report Type</label><input class="field-input" type="text" id="delay-fReportType-iptsp" value="Delay Report — IPTSP" placeholder="e.g. Delay Report"></div>
-          <div class="field-block"><label>Reporter Name</label><input class="field-input" type="text" id="delay-fReporter-iptsp" placeholder="e.g. Rizvi"></div>
+          <input type="hidden" id="delay-fReporter-iptsp" value="Rizvi">
         </div>
         <div class="field-grid" style="margin-top:1rem;">
           <div class="field-block"><label>Status</label>

@@ -1436,6 +1436,7 @@ function resetAll(btn){
     const box=document.getElementById(`${p}-issue-box`);if(box)box.style.display='none';
     const rep=document.getElementById(`${p}-reporter`);if(rep)rep.value='Rizvi';
   });
+  const globalRep=document.getElementById('global-reporter');if(globalRep)globalRep.value='Rizvi';
   // File inputs
   document.querySelectorAll('input[type=file]').forEach(f=>{f.value='';});
   // Backup
@@ -1512,10 +1513,12 @@ function initReporterAutocomplete(inputId){
       if(activeIdx>=0 && items[activeIdx]){
         e.preventDefault();
         input.value=items[activeIdx].dataset.name;
+        input.dispatchEvent(new Event('input',{bubbles:true}));
         list.style.display='none';
       } else if(items.length===1){
         e.preventDefault();
         input.value=items[0].dataset.name;
+        input.dispatchEvent(new Event('input',{bubbles:true}));
         list.style.display='none';
       }
     } else if(e.key==='Escape'){
@@ -1525,7 +1528,11 @@ function initReporterAutocomplete(inputId){
 
   list.addEventListener('mousedown',e=>{
     const item=e.target.closest('.autocomplete-item');
-    if(item){ input.value=item.dataset.name; list.style.display='none'; }
+    if(item){
+      input.value=item.dataset.name;
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+      list.style.display='none';
+    }
   });
 
   input.addEventListener('blur',()=>{
@@ -1533,14 +1540,31 @@ function initReporterAutocomplete(inputId){
   });
 }
 
+const ALL_REPORTER_FIELD_IDS=[
+  '9mno-reporter','9iptsp-reporter',
+  '1mno-reporter','1iptsp-reporter',
+  'http-reporter',
+  'dlrmno-reporter','dlriptsp-reporter',
+  'delay-fReporter-mno','delay-fReporter-iptsp'
+];
+
 function initAllReporterAutocompletes(){
-  [
-    '9mno-reporter','9iptsp-reporter',
-    '1mno-reporter','1iptsp-reporter',
-    'http-reporter',
-    'dlrmno-reporter','dlriptsp-reporter',
-    'delay-fReporter-mno','delay-fReporter-iptsp'
-  ].forEach(initReporterAutocomplete);
+  initReporterAutocomplete('global-reporter');
+  initGlobalReporterSync();
+}
+
+/* ── Global "Prepared By" — typing/selecting here fills every report's reporter field ── */
+function initGlobalReporterSync(){
+  const global=document.getElementById('global-reporter');
+  if(!global) return;
+  const sync=()=>{
+    ALL_REPORTER_FIELD_IDS.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.value=global.value;
+    });
+  };
+  global.addEventListener('input',sync);
+  sync();
 }
 
 /* ── Generic drag-and-drop for all .upload-zone boxes (9xxx, 1xxx, 4xx/5xx HTTP, DLR) ── */

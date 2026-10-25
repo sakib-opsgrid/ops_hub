@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="hub-theme tool-cp">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,16 +17,16 @@
   --text:      #1A1916;
   --text-2:    #6B6860;
   --text-3:    #A8A69E;
-  --accent:    #6D28D9;
-  --accent-2:  #7C3AED;
+  --accent:    #5B4FD9;
+  --accent-2:  #4C41C2;
   --accent-bg: #F3F0FF;
   --accent-bdr:#C4B5FD;
-  --accent-dim:rgba(109,40,217,0.08);
+  --accent-dim:rgba(91,79,217,0.08);
   --ok:        #1A6B3C;
   --ok-bg:     #EBF7F1;
   --err:       #B91C1C;
   --err-bg:    #FEF2F2;
-  --tok-key:   #6D28D9;
+  --tok-key:   #5B4FD9;
   --tok-str:   #1A6B3C;
   --tok-num:   #1D4ED8;
   --tok-bool:  #92400E;
@@ -59,7 +59,7 @@ body {
 body::before {
   content: '';
   position: fixed; inset: 0;
-  background-image: radial-gradient(circle, rgba(109,40,217,0.07) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(91,79,217,0.07) 1px, transparent 1px);
   background-size: 36px 36px;
   pointer-events: none; z-index: 0;
 }
@@ -181,7 +181,7 @@ textarea#inputArea::placeholder { color: var(--text-3); }
 }
 .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-primary:hover { background: var(--accent-2); box-shadow: 0 3px 10px rgba(109,40,217,0.3); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--accent-2); box-shadow: 0 3px 10px rgba(91,79,217,0.3); transform: translateY(-1px); }
 .btn-primary:active { transform: translateY(0); }
 .btn-secondary { background: var(--text); color: #fff; }
 .btn-secondary:hover { background: #2A2926; box-shadow: 0 3px 10px rgba(0,0,0,0.2); transform: translateY(-1px); }
@@ -264,15 +264,20 @@ footer {
 .in-hub .tab-nav{ top:0!important; }
 .in-hub{ --topbar:0px!important; }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link rel="stylesheet" href="../assets/theme.css">
 </head>
 <body>
 <div class="app">
   <header class="unified-header" >
-  <div class="uh-icon" style="background:#F3F0FF;border-color:#C4B5FD;color:#6D28D9">
+  <div class="uh-icon" style="background:#F3F0FF;border-color:#C4B5FD;color:#5B4FD9">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/><rect x="8" y="2" width="8" height="6" rx="1.5"/><path d="M9 14l2 2 4-4"/></svg>
   </div>
   <div class="uh-info">
-    <div class="uh-title">Infozillion Teletech Bd Ltd <span class="uh-badge" style="background:#F3F0FF;border:1px solid #C4B5FD;color:#6D28D9">v2.4</span></div>
+    <div class="uh-title">Infozillion Teletech Bd Ltd <span class="uh-badge" style="background:#F3F0FF;border:1px solid #C4B5FD;color:#5B4FD9">v2.4</span></div>
     <div class="uh-sub">Service Assurance · ANS Msg JSON · A2P Log Conversion</div>
   </div>
   <div class="uh-actions">

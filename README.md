@@ -9,7 +9,7 @@
 
 OpsHub is a premium single-page hub built for the Service Assurance team at Infozillion Teletech Bd Ltd. It replaces the need to maintain and share multiple separate tool links — everything is accessible from one URL, with a consistent professional interface across all tools.
 
-**Version:** v3.0.0  
+**Version:** v5.0.0  
 **Protocol:** Works locally via `file://` and remotely via GitHub Pages  
 **Dependencies:** None — pure HTML, CSS, and JavaScript. No build step required.
 
@@ -91,8 +91,8 @@ ops_hub/
 - **Tab switching** — sidebar sub-items jump directly to specific tabs inside tools
 
 ### Visual
-- **Typography** — DM Sans · DM Mono · Instrument Serif
-- **Color palette** — warm off-white (`#F5F4F0`) background, white surfaces, `#1A1916` dark text
+- **Typography** — Inter (hub and every tool, via assets/theme.css)
+- **Layout / palette** — admin-portal style: white sidebar with logo and grouped navigation, light lavender-gray canvas, white rounded cards, indigo accent
 - **Tool accents** — each tool has a unique color identity maintained across sidebar, cards, and viewer
 
 ---
